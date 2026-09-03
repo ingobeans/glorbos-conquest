@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    min-height: 100vh;
 }
 
 #game-grid {
@@ -11,8 +12,9 @@ body {
     width: var(--width);
     aspect-ratio: 1;
     line-height: 0;
-    margin-left: calc(50vw - var(--width) / 2);
-    margin-top: calc(50vh - var(--width) / 2);
+    position: absolute;
+    left: calc(50vw - var(--width) / 2);
+    top: calc(50vh - var(--width) / 2);
     outline: solid 3px black;
 }
 
@@ -28,4 +30,31 @@ body {
 
 .tile:nth-child(odd) {
     background-color: #dbdbdb;
+}
+
+#player-deck {
+    --gap: 7px;
+    --count: 5;
+    --width: 130px;
+    --total-width: calc(var(--count) * (var(--width) + var(--gap)));
+    width: var(--total-width);
+    display: block;
+    position: absolute;
+    bottom: 5px;
+    left: calc(50% - var(--total-width) / 2);
+}
+
+.held-card {
+    --index: 0;
+    --arc-factor: 0.15;
+    background-color: black;
+    width: var(--width);
+    height: 170px;
+    display: inline-block;
+    position: absolute;
+    left: calc(var(--index) * (var(--width) + var(--gap)));
+
+    --circle-x: (var(--index) / (var(--count) - 1.0) - 0.5) * 2 * var(--arc-factor);
+    rotate: calc(asin(var(--circle-x)));
+    top: calc(cos(asin(var(--circle-x) * 2)) * -350px + 160px);
 }
