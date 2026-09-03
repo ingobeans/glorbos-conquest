@@ -52,13 +52,12 @@ function cardMouseDown(element: any, event: MouseEvent) {
     drag.startY = event.clientY;
     drag.mouseX = event.clientX;
     drag.mouseY = event.clientY;
-    drag.deckZone = getMousePlayerDeckZone(drag.mouseX, drag.mouseY);
-    console.log("start: " + drag.deckZone);
     drag.element = element;
     drag.active = true;
     element.style.transition = "0s";
     element.classList.add("dragged-card");
     drag.cardStartIndex = parseInt((<any>drag.element).id.replace("held-card-", ""));
+    drag.deckZone = drag.cardStartIndex;
 };
 function getMousePlayerDeckZone(mouseX: number, mouseY: number): number {
     let rect = playerDeck?.getBoundingClientRect();
