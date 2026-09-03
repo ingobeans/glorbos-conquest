@@ -63,7 +63,8 @@ body {
     transform: translateY(0px);
 }
 
-.held-card:hover {
+.held-card:hover,
+.dragged-card {
     scale: 1.4;
     transition: 0.2s;
     transform: translateY(-40px);
