@@ -1,3 +1,7 @@
+body {
+    margin: 0;
+}
+
 #game-grid {
     --size: 5;
     --gap: 0px;
@@ -5,8 +9,10 @@
 
     --width: calc(var(--size) * (var(--tile-size) + var(--gap)));
     width: var(--width);
+    aspect-ratio: 1;
     line-height: 0;
-    margin-left: calc(50% - var(--width) / 2);
+    margin-left: calc(50vw - var(--width) / 2);
+    margin-top: calc(50vh - var(--width) / 2);
     outline: solid 3px black;
 }
 
@@ -14,8 +20,12 @@
     display: inline-block;
     width: var(--tile-size);
     aspect-ratio: 1;
-    background-color: white;
+    background-color: #f7f7f7;
     outline: solid 2px black;
     margin-left: var(--gap);
     margin-bottom: var(--gap);
+}
+
+.tile:nth-child(odd) {
+    background-color: #dbdbdb;
 }
