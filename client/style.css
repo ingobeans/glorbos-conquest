@@ -65,7 +65,6 @@ body {
 
 .held-card:hover {
     scale: 1.4;
-    z-index: 5;
     transition: 0.2s;
     transform: translateY(-40px);
     rotate: calc(var(--rotate) / 4);

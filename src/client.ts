@@ -13,4 +13,11 @@ for (let i = 0; i < game.board.size * game.board.size; i++) {
     gameGrid?.append(element);
 }
 
+
+
+let zIndex = 0;
+(<any>globalThis).mouseCard = function (element: any) {
+    zIndex++;
+    element.style.zIndex = zIndex;
+};
 console.log(cardRegistry);
