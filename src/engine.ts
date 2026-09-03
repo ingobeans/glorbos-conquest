@@ -1,12 +1,10 @@
 const VERSION = "0.1.0";
 
-interface Card {
-    name: string
-}
-interface LivingEntity {
-    health: number;
-}
-class SpellCard { }
+import { populate } from "./registry";
+import { Card, cardRegistry } from "./cards"
+import { SpellCard, spellCardRegistry } from "./spellcards"
+
+populate();
 
 class Player {
     deck: Card[] = [];
@@ -36,3 +34,6 @@ class Game {
     players: Player[] = [];
     board: Board = new Board();
 }
+
+console.log(cardRegistry);
+console.log(spellCardRegistry);
