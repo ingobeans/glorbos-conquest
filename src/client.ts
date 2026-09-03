@@ -3,21 +3,37 @@ import { Game } from "./engine";
 
 let game = new Game();
 
-let gameGrid = document.getElementById("game-grid");
+console.log(cardRegistry);
 
-gameGrid?.style.setProperty("--size", game.board.size.toString());
-for (let i = 0; i < game.board.size * game.board.size; i++) {
-    let element = document.createElement("div");
-    element.classList.add("tile");
-    element.id = "tile" + i;
-    gameGrid?.append(element);
+let gameGrid = document.getElementById("game-grid");
+let playerDeck = document.getElementById("player-deck");
+
+function createGridElements(size: number) {
+    gameGrid?.style.setProperty("--size", size.toString());
+    for (let i = 0; i < size * size; i++) {
+        let element = document.createElement("div");
+        element.classList.add("tile");
+        element.id = "tile" + i;
+        gameGrid?.append(element);
+    }
 }
 
-
+function createPlayerHandElements(count: number) {
+    for (let i = 0; i < count; i++) {
+        let element = document.createElement("div");
+        element.classList.add("held-card");
+        element.style.setProperty("--index", i.toString());
+        element.onmouseover = mouseCard.bind(null, element);
+        playerDeck?.append(element);
+    }
+    playerDeck?.style.setProperty("--count", count.toString());
+}
 
 let zIndex = 0;
-(<any>globalThis).mouseCard = function (element: any) {
+function mouseCard(element: any) {
     zIndex++;
     element.style.zIndex = zIndex;
 };
-console.log(cardRegistry);
+
+createGridElements(game.board.size);
+createPlayerHandElements(5);
