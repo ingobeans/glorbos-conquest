@@ -1,9 +1,5 @@
-import { Card, cardRegistry } from "./cards";
-import { Game } from "./engine";
-
-let game = new Game(5);
-
-console.log(cardRegistry);
+import { Card } from "../cards";
+import { Game } from "../engine";
 
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
@@ -35,6 +31,7 @@ function createPlayerHandElements(deck: Card[]) {
     }
     playerDeck?.style.setProperty("--count", deck.length.toString());
 }
+
 
 let zIndex = 0;
 function mouseHoverCard(element: any) {
@@ -128,5 +125,7 @@ document.addEventListener("mousemove", (event) => {
     }
 });
 
-createGridElements(game.board.size);
-createPlayerHandElements(<Card[]>game.players[0]?.deck);
+export function loadUi(game: Game) {
+    createGridElements(game.board.size);
+    createPlayerHandElements(<Card[]>game.players[0]?.deck);
+}
