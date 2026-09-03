@@ -21,7 +21,8 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     // Style Options
-    // "noImplicitReturns": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
     // "noImplicitOverride": true,
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
