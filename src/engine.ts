@@ -27,13 +27,17 @@ class Tile {
 }
 
 class Board {
+    size: number;
     tiles: Tile[] = [];
+    constructor(size: number) {
+        this.size = size;
+        for (let i = 0; i < size * size; i++) {
+            this.tiles.push(new Tile());
+        }
+    }
 }
 
-class Game {
+export class Game {
     players: Player[] = [];
-    board: Board = new Board();
+    board: Board = new Board(5);
 }
-
-console.log(cardRegistry);
-console.log(spellCardRegistry);

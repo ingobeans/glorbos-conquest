@@ -1,0 +1,21 @@
+#game-grid {
+    --size: 5;
+    --gap: 0px;
+    --tile-size: 100px;
+
+    --width: calc(var(--size) * (var(--tile-size) + var(--gap)));
+    width: var(--width);
+    line-height: 0;
+    margin-left: calc(50% - var(--width) / 2);
+    outline: solid 3px black;
+}
+
+.tile {
+    display: inline-block;
+    width: var(--tile-size);
+    aspect-ratio: 1;
+    background-color: white;
+    outline: solid 2px black;
+    margin-left: var(--gap);
+    margin-bottom: var(--gap);
+}
