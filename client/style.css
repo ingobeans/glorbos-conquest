@@ -47,7 +47,8 @@ body {
 .held-card {
     --index: 0;
     --arc-factor: 0.15;
-    background-color: black;
+    background-color: rgb(255, 255, 255);
+    border: solid 2px black;
     width: var(--width);
     height: 170px;
     display: inline-block;
@@ -56,5 +57,15 @@ body {
 
     --circle-x: (var(--index) / (var(--count) - 1.0) - 0.5) * 2 * var(--arc-factor);
     rotate: calc(asin(var(--circle-x)));
-    top: calc(cos(asin(var(--circle-x) * 2)) * -350px + 160px);
+    top: calc(cos(asin(var(--circle-x) * 2)) * -350px + 155px);
+    transition: 0.1s;
+    transform: translateY(0px);
+}
+
+.held-card:hover {
+    scale: 1.4;
+    z-index: 5;
+    transition: 0.2s;
+    transform: translateY(-50px);
+    rotate: 0deg;
 }
