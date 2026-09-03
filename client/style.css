@@ -58,7 +58,7 @@ body {
     --circle-x: (var(--index) / (var(--count) - 1.0) - 0.5) * 2 * var(--arc-factor);
     --rotate: calc(asin(var(--circle-x)));
     rotate: var(--rotate);
-    top: calc(cos(asin(var(--circle-x) * 2)) * -350px + 155px);
+    top: calc(cos(asin(var(--circle-x) * 2)) * -350px + 152px);
     transition: 0.1s;
     transform: translateY(0px);
 }
@@ -69,4 +69,18 @@ body {
     transition: 0.2s;
     transform: translateY(-40px);
     rotate: calc(var(--rotate) / 4);
+}
+
+.no-drag,
+.held-card {
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.held-card>img {
+    width: 100%;
+    pointer-events: none;
 }

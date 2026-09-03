@@ -1,7 +1,7 @@
-import { cardRegistry } from "./cards";
+import { Card, cardRegistry } from "./cards";
 import { Game } from "./engine";
 
-let game = new Game();
+let game = new Game(5);
 
 console.log(cardRegistry);
 
@@ -18,17 +18,22 @@ function createGridElements(size: number) {
     }
 }
 
-function createPlayerHandElements(count: number) {
-    for (let i = 0; i < count; i++) {
+function createPlayerHandElements(deck: Card[]) {
+    for (let i = 0; i < deck.length; i++) {
         let element = document.createElement("div");
         element.classList.add("held-card");
         element.id = "held-card-" + i.toString();
         element.style.setProperty("--index", i.toString());
         element.onmouseover = mouseHoverCard.bind(null, element);
         element.onmousedown = cardMouseDown.bind(null, element);
+
+        let image = document.createElement("img");
+        image.src = "assets/cards/" + <string>deck[i]?.image + ".png";
+        element.appendChild(image);
+
         playerDeck?.append(element);
     }
-    playerDeck?.style.setProperty("--count", count.toString());
+    playerDeck?.style.setProperty("--count", deck.length.toString());
 }
 
 let zIndex = 0;
@@ -124,4 +129,4 @@ document.addEventListener("mousemove", (event) => {
 });
 
 createGridElements(game.board.size);
-createPlayerHandElements(5);
+createPlayerHandElements(<Card[]>game.players[0]?.deck);

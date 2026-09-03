@@ -1,5 +1,6 @@
 export interface Card {
     name: string;
+    image: string;
 }
 export interface LivingEntity {
     health: number;

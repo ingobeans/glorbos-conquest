@@ -7,9 +7,16 @@ import { SpellCard, spellCardRegistry } from "./spellcards"
 populate();
 
 class Player {
-    deck: Card[] = [];
+    deck: Card[];
     spelldeck: SpellCard[] = [];
     gold: number = 0;
+    constructor(deckSize: number) {
+        this.deck = [];
+        for (let i = 0; i < deckSize; i++) {
+            let card = cardRegistry[Math.floor(Math.random() * cardRegistry.length)];
+            this.deck.push(<any>card);
+        }
+    }
 }
 
 class PlacedCard {
@@ -38,6 +45,10 @@ class Board {
 }
 
 export class Game {
-    players: Player[] = [];
-    board: Board = new Board(5);
+    players: Player[];
+    board: Board;
+    constructor(boardSize: number) {
+        this.players = [new Player(5), new Player(5)];
+        this.board = new Board(boardSize);
+    }
 }
