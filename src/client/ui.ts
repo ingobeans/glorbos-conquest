@@ -1,4 +1,5 @@
 import { Card } from "../cards";
+import { ElementType } from "../elements";
 import { Game } from "../engine";
 
 let gameGrid = document.getElementById("game-grid");
@@ -16,6 +17,7 @@ function createGridElements(size: number) {
 
 function createPlayerHandElements(deck: Card[]) {
     for (let i = 0; i < deck.length; i++) {
+        let item = <Card>deck[i];
         let element = document.createElement("div");
         element.classList.add("held-card");
         element.id = "held-card-" + i.toString();
@@ -25,7 +27,7 @@ function createPlayerHandElements(deck: Card[]) {
 
         let image = document.createElement("img");
         image.classList.add("card-img");
-        image.src = "assets/cards/" + <string>deck[i]?.image + ".png";
+        image.src = "assets/cards/" + <string>item.image + ".png";
         element.appendChild(image);
 
         for (let i = 0; i < 5; i++) {
@@ -38,6 +40,14 @@ function createPlayerHandElements(deck: Card[]) {
             if (i > 2) {
                 image.src = "assets/heart_empty.png";
             }
+            element.appendChild(image);
+        }
+
+        for (const [index, type] of item.elementTypes.entries()) {
+            let image = document.createElement("img");
+            image.classList.add("card-type");
+            image.src = "assets/elements/" + ElementType[type] + ".png";
+            image.style.setProperty("--index", index.toString());
             element.appendChild(image);
         }
 

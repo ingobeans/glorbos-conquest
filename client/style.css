@@ -98,3 +98,11 @@ body {
 .card-heart {
     width: 18px;
 }
+
+.card-type {
+    --index: 0;
+    width: 28px;
+    position: absolute;
+    top: 0;
+    left: calc(var(--index) * 24px);
+}
