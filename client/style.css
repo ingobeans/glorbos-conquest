@@ -22,14 +22,17 @@ body {
     display: inline-block;
     width: var(--tile-size);
     aspect-ratio: 1;
-    background-color: #f7f7f7;
+    background-color: #bfdb59;
     outline: solid 2px black;
     margin-left: var(--gap);
     margin-bottom: var(--gap);
+    background-image: url("assets/grass.png");
+    background-size: cover;
+    filter: brightness(1.0);
 }
 
 .tile:nth-child(odd) {
-    background-color: #dbdbdb;
+    filter: brightness(0.9) saturate(1.2);
 }
 
 #player-deck {
