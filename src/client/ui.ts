@@ -31,6 +31,14 @@ function sendPlayerAction(action: PlayerAction) {
         element.classList.remove("held-card");
         element.classList.add("placed-card");
         tile.appendChild(element);
+        let startIndex = parseInt(element.id.replace("held-card-", ""));
+        for (let i = startIndex; i <= activeClient.player.deck.length; i++) {
+            let e = <any>document.getElementById("held-card-" + i.toString());
+            e.id = "held-card-" + (i - 1).toString();
+            e.style.setProperty("--index", (i - 1).toString());
+        }
+        element.id = "";
+        playerDeck?.style.setProperty("--count", activeClient.player.deck.length.toString());
     }
 }
 
