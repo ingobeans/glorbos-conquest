@@ -87,7 +87,14 @@ body {
     -ms-user-select: none;
 }
 
-.held-card>img {
-    width: 100%;
+.held-card img {
     pointer-events: none;
+}
+
+.card-img {
+    width: 100%;
+}
+
+.card-heart {
+    width: 18px;
 }

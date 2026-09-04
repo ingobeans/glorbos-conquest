@@ -24,8 +24,22 @@ function createPlayerHandElements(deck: Card[]) {
         element.onmousedown = cardMouseDown.bind(null, element);
 
         let image = document.createElement("img");
+        image.classList.add("card-img");
         image.src = "assets/cards/" + <string>deck[i]?.image + ".png";
         element.appendChild(image);
+
+        for (let i = 0; i < 5; i++) {
+            let image = document.createElement("img");
+            image.classList.add("card-heart");
+            image.src = "assets/heart.png";
+            if (i > 1) {
+                image.src = "assets/heart_half.png";
+            }
+            if (i > 2) {
+                image.src = "assets/heart_empty.png";
+            }
+            element.appendChild(image);
+        }
 
         playerDeck?.append(element);
     }
