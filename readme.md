@@ -5,5 +5,5 @@
 ## building
 
 ```bash
-tsc && esbuild --bundle dist/client.js > client/client.js
+tsc && esbuild --bundle dist/client/client.js > client/client.js
 ```
