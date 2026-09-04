@@ -84,7 +84,8 @@ document.addEventListener("mouseup", (event) => {
     drag.active = false;
     (<any>drag.element).style.transition = "";
     (<any>drag.element).classList.remove("dragged-card");
-    (<any>drag.element).style.transform = ``;
+    (<any>drag.element).style.setProperty("--x", "");
+    (<any>drag.element).style.setProperty("--y", "");
     (<any>drag.element).style.setProperty("--index", drag.deckZone.toString());
     (<any>drag.element).id = "held-card-" + drag.deckZone.toString();
 });
@@ -96,10 +97,8 @@ document.addEventListener("mousemove", (event) => {
     let deltaX = drag.mouseX - drag.startX;
     let deltaY = drag.mouseY - drag.startY;
     if (drag.element) {
-        deltaX /= 1.4;
-        deltaY /= 1.4;
-        deltaY -= 40;
-        (<any>drag.element).style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        (<any>drag.element).style.setProperty("--x", deltaX.toString() + "px");
+        (<any>drag.element).style.setProperty("--y", deltaY.toString() + "px");
     }
 
     // find if card is being reordered in deck

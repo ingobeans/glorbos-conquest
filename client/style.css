@@ -45,8 +45,11 @@ body {
 }
 
 .held-card {
+    --x: 0px;
+    --y: 0px;
     --index: 0;
     --arc-factor: 0.15;
+    --scale: 1.0;
     background-color: rgb(255, 255, 255);
     border: solid 2px black;
     width: var(--width);
@@ -60,14 +63,15 @@ body {
     rotate: var(--rotate);
     top: calc(cos(asin(var(--circle-x) * 2)) * -350px + 152px);
     transition: 0.1s;
-    transform: translateY(0px);
+    transform: translate(calc(var(--x) / var(--scale)), calc(var(--y) / var(--scale)));
+    scale: var(--scale);
 }
 
 .held-card:hover,
 .dragged-card {
-    scale: 1.4;
+    --scale: 1.4;
     transition: 0.2s;
-    transform: translateY(-40px);
+    transform: translate(calc(var(--x) / var(--scale)), calc(var(--y) / var(--scale) - 40px));
     rotate: calc(var(--rotate) / 4);
 }
 
