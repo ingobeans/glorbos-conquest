@@ -1,4 +1,4 @@
-import { Card, cardRegistry } from "../cards";
+import { cardRegistry } from "../cards";
 import { Game } from "../engine";
 import { loadUi } from "./ui";
 
