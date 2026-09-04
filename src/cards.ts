@@ -1,6 +1,9 @@
+import { ElementType } from "./elements";
+
 export interface Card {
     name: string;
     image: string;
+    elementTypes: ElementType[];
 }
 export interface LivingEntity {
     health: number;

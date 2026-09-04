@@ -4,6 +4,7 @@ class Sorcerer implements Card, LivingEntity {
     name = "Sorcerer";
     health = 0;
     image = "sorcerer";
+    elementTypes = [];
 }
 
 export function register() {
