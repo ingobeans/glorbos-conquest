@@ -1,15 +1,11 @@
 import { ElementType } from "./elements";
 
-export interface Card {
-    name: string;
-    image: string;
-    elementTypes: ElementType[];
-}
-export interface LivingEntity {
-    health: number;
-}
-export function isLiving(arg: any): arg is LivingEntity {
-    return "health" in arg;
+export class Card {
+    name: string = "Unknown";
+    image: string = "";
+    elementTypes: ElementType[] = [];
+    maxHealth: number = 0;
+    health: number = 0;
 }
 
 export let cardRegistry: Card[] = [];

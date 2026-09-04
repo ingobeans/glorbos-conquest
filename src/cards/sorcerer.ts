@@ -1,10 +1,10 @@
-import { Card, LivingEntity, registerCard } from "../cards";
+import { Card, registerCard } from "../cards";
 
-class Sorcerer implements Card, LivingEntity {
+class Sorcerer extends Card {
     name = "Sorcerer";
-    health = 0;
     image = "sorcerer";
     elementTypes = [];
+    maxHealth = 5;
 }
 
 export function register() {

@@ -30,15 +30,15 @@ function createPlayerHandElements(deck: Card[]) {
         image.src = "assets/cards/" + <string>item.image + ".png";
         element.appendChild(image);
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < item.maxHealth / 2; i++) {
+            console.log(i);
+            console.log(item.maxHealth / 2);
+            console.log("item.maxHealth^");
             let image = document.createElement("img");
             image.classList.add("card-heart");
-            image.src = "assets/heart.png";
-            if (i > 1) {
-                image.src = "assets/heart_half.png";
-            }
-            if (i > 2) {
-                image.src = "assets/heart_empty.png";
+            image.src = "assets/graphics/heart.png";
+            if (i != item.maxHealth / 2 && i == Math.floor(item.maxHealth / 2)) {
+                image.src = "assets/graphics/heart_half_full.png";
             }
             element.appendChild(image);
         }
@@ -102,7 +102,7 @@ function getMousePlayerDeckZone(mouseX: number, mouseY: number): number {
     return -1;
 }
 
-document.addEventListener("mouseup", (event) => {
+document.addEventListener("mouseup", (_) => {
     if (!drag.active)
         return;
     drag.active = false;

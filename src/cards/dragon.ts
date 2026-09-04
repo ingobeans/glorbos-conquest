@@ -1,11 +1,11 @@
-import { Card, LivingEntity, registerCard } from "../cards";
+import { Card, registerCard } from "../cards";
 import { ElementType } from "../elements";
 
-class Dragon implements Card, LivingEntity {
+class Dragon extends Card {
     name = "Dragon";
-    health = 0;
     image = "dragon";
     elementTypes = [ElementType.Fire, ElementType.Dark];
+    maxHealth = 8;
 }
 
 export function register() {
