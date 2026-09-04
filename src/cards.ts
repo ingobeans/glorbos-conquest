@@ -6,6 +6,7 @@ export class Card {
     elementTypes: ElementType[] = [];
     maxHealth: number = 0;
     health: number = 0;
+    entityId: number = -1;
 }
 
 export let cardRegistry: Card[] = [];
