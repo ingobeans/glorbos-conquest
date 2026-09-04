@@ -85,7 +85,7 @@ function createPlayerHandElements(deck: Card[]) {
         for (const [index, type] of item.elementTypes.entries()) {
             let image = document.createElement("img");
             image.classList.add("card-type");
-            image.src = "assets/elements/" + ElementType[type] + ".png";
+            image.src = "assets/elements/" + ElementType[type].toLowerCase() + ".png";
             image.style.setProperty("--index", index.toString());
             element.appendChild(image);
         }
