@@ -95,7 +95,7 @@ function getMousePlayerDeckZone(mouseX: number, mouseY: number): number {
     if (mouseY < y - 200) {
         return -1;
     }
-    if (mouseX >= x && mouseX <= x + w) {
+    if (mouseX >= x && mouseX < x + w) {
         let index = Math.floor((mouseX - x) / zoneWidth);
         return index;
     }
