@@ -3,6 +3,7 @@ import { Card, cardRegistry } from "./cards"
 import { SpellCard, spellCardRegistry } from "./spellcards"
 import { PlaceCardPlayerAction, PlaceCardServerAction, PlayerAction, ProcessPlayerActionError, ProcessPlayerActionResult, StatePlayerAction, StatePlayerActionType } from "./actions";
 import { BoardPosition } from "./board";
+import { clone } from "./utils";
 
 populate();
 
@@ -33,9 +34,9 @@ class Deck {
     populateCards() {
         this.cards = [];
         for (let card of cardRegistry) {
-            let clone = structuredClone(card);
-            clone.entityId = this.game.currentEntityID;
-            this.cards.push(clone);
+            let cloned = clone(card);
+            cloned.entityId = this.game.currentEntityID;
+            this.cards.push(cloned);
             this.game.currentEntityID++;
         }
         this.cards = shuffle(this.cards);
@@ -87,7 +88,7 @@ export class Player {
     }
 }
 
-class PlacedCard {
+export class PlacedCard {
     card: Card;
     owner: Player;
 
