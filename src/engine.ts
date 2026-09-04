@@ -1,5 +1,3 @@
-const VERSION = "0.1.2";
-
 import { populate } from "./registry";
 import { Card, cardRegistry } from "./cards"
 import { SpellCard, spellCardRegistry } from "./spellcards"

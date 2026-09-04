@@ -1,0 +1,26 @@
+{
+  "name": "glorbos-conquest",
+  "version": "0.1.15",
+  "description": "(secret project! no peeking!!)",
+  "main": "index.js",
+  "watch": {
+    "build": {
+      "patterns": [
+        "src"
+      ],
+      "extensions": "ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && esbuild --bundle dist/client/client.js > client/client.js",
+    "watch": "npm-watch build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-loader": "^9.6.2",
+    "typescript": "^7.0.2",
+    "webpack": "^5.110.3",
+    "webpack-cli": "^7.2.3"
+  }
+}
