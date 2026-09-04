@@ -22,5 +22,9 @@
     "typescript": "^7.0.2",
     "webpack": "^5.110.3",
     "webpack-cli": "^7.2.3"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "three": "^0.185.1"
   }
 }
