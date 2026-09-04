@@ -1,4 +1,5 @@
 import { BoardPosition } from "./board";
+import { Card } from "./cards";
 
 export class ProcessPlayerActionError {
     text: string;
@@ -7,7 +8,16 @@ export class ProcessPlayerActionError {
     }
 }
 
-export type ProcessPlayerActionResult = ProcessPlayerActionError;
+export class PlaceCardServerAction {
+    card: Card;
+    position: BoardPosition;
+    constructor(card: Card, position: BoardPosition) {
+        this.card = card;
+        this.position = position;
+    }
+}
+
+export type ProcessPlayerActionResult = ProcessPlayerActionError | PlaceCardServerAction;
 
 
 export enum StatePlayerActionType {

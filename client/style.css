@@ -47,15 +47,27 @@ body {
     left: calc(50% - var(--total-width) / 2);
 }
 
+.card {
+    --width: 130px;
+    background-color: rgb(255, 255, 255);
+    border: solid 2px black;
+    width: var(--width);
+}
+
+.placed-card {
+    --width: 72%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .held-card {
     --x: 0px;
     --y: 0px;
     --index: 0;
     --arc-factor: 0.15;
     --scale: 1.0;
-    background-color: rgb(255, 255, 255);
-    border: solid 2px black;
-    width: var(--width);
     height: 170px;
     display: inline-block;
     position: absolute;
@@ -79,7 +91,7 @@ body {
 }
 
 .no-drag,
-.held-card {
+.card {
     -webkit-user-drag: none;
     user-select: none;
     -moz-user-select: none;
@@ -87,7 +99,7 @@ body {
     -ms-user-select: none;
 }
 
-.held-card img {
+.card img {
     pointer-events: none;
 }
 
@@ -96,13 +108,13 @@ body {
 }
 
 .card-heart {
-    width: 18px;
+    width: 15%;
 }
 
 .card-type {
     --index: 0;
-    width: 28px;
+    width: 22%;
     position: absolute;
     top: 0;
-    left: calc(var(--index) * 24px);
+    left: calc(var(--index) * 20%);
 }

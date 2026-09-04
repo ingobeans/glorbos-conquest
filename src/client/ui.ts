@@ -1,4 +1,4 @@
-import { PlaceCardPlayerAction } from "../actions";
+import { PlaceCardPlayerAction, PlaceCardServerAction, PlayerAction } from "../actions";
 import { BoardPosition } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
@@ -9,6 +9,30 @@ let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
 
 export let activeClient: Client | undefined = undefined;
+
+function sendPlayerAction(action: PlayerAction) {
+    if (!activeClient)
+        throw Error("No active client");
+
+    let result = activeClient.sendPlayerAction(action);
+    console.log(JSON.stringify(result));
+
+    if (result instanceof PlaceCardServerAction) {
+        let element = document.querySelector(`.held-card[entityId='${result.card.entityId.toString()}']`);
+        if (!element)
+            throw Error("Card to be placed not found!");
+
+        let tile = document.getElementById("tile" + result.position.toIndex(activeClient.board.size));
+        if (!tile)
+            throw Error("Tile not found");
+
+        (<any>element).onmouseover = undefined;
+        (<any>element).onmousedown = undefined;
+        element.classList.remove("held-card");
+        element.classList.add("placed-card");
+        tile.appendChild(element);
+    }
+}
 
 function createGridElements(size: number) {
     gameGrid?.style.setProperty("--size", size.toString());
@@ -26,6 +50,7 @@ function createPlayerHandElements(deck: Card[]) {
         let element = document.createElement("div");
         element.setAttribute("entityId", item.entityId.toString());
         element.classList.add("held-card");
+        element.classList.add("card");
         element.id = "held-card-" + i.toString();
         element.style.setProperty("--index", i.toString());
         element.onmouseover = mouseHoverCard.bind(null, element);
@@ -140,8 +165,7 @@ document.addEventListener("mouseup", (_) => {
     if (pos) {
         if (activeClient) {
             let id = parseInt(drag.element?.getAttribute("entityId") || "-1");
-            let result = activeClient.sendPlayerAction(new PlaceCardPlayerAction(id, pos));
-            console.log(JSON.stringify(result));
+            sendPlayerAction(new PlaceCardPlayerAction(id, pos));
         }
     }
 });

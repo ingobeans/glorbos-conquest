@@ -5,4 +5,7 @@ export class BoardPosition {
         this.x = x;
         this.y = y;
     }
+    toIndex(boardSize: number): number {
+        return this.x + this.y * boardSize;
+    }
 }

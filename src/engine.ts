@@ -1,7 +1,7 @@
 import { populate } from "./registry";
 import { Card, cardRegistry } from "./cards"
 import { SpellCard, spellCardRegistry } from "./spellcards"
-import { PlaceCardPlayerAction, PlayerAction, ProcessPlayerActionError, ProcessPlayerActionResult, StatePlayerAction, StatePlayerActionType } from "./actions";
+import { PlaceCardPlayerAction, PlaceCardServerAction, PlayerAction, ProcessPlayerActionError, ProcessPlayerActionResult, StatePlayerAction, StatePlayerActionType } from "./actions";
 import { BoardPosition } from "./board";
 
 populate();
@@ -135,6 +135,7 @@ export class Game {
             }
             let placed = new PlacedCard(card, player);
             this.board.placeCardAt(placed, action.position);
+            return new PlaceCardServerAction(card, action.position);
         }
         else if (action instanceof StatePlayerAction) {
             switch (action.type) {
