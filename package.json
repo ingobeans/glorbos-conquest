@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc && esbuild --bundle dist/client/client.js > client/client.js",
+    "build": "tsc && esbuild --bundle dist/client/main.js > client/client.js",
     "watch": "npm-watch build"
   },
   "author": "",

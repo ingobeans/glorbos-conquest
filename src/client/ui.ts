@@ -1,9 +1,14 @@
+import { PlaceCardPlayerAction } from "../actions";
+import { BoardPosition } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
 import { Game } from "../engine";
+import { Client } from "./client";
 
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
+
+export let activeClient: Client | undefined = undefined;
 
 function createGridElements(size: number) {
     gameGrid?.style.setProperty("--size", size.toString());
@@ -19,6 +24,7 @@ function createPlayerHandElements(deck: Card[]) {
     for (let i = 0; i < deck.length; i++) {
         let item = <Card>deck[i];
         let element = document.createElement("div");
+        element.setAttribute("entityId", item.entityId.toString());
         element.classList.add("held-card");
         element.id = "held-card-" + i.toString();
         element.style.setProperty("--index", i.toString());
@@ -69,7 +75,7 @@ let drag = {
     startX: 0,
     startY: 0,
     deckZone: -1,
-    element: null,
+    element: <Element | null>null,
     active: false,
     cardStartIndex: 0,
 };
@@ -85,6 +91,22 @@ function cardMouseDown(element: any, event: MouseEvent) {
     drag.cardStartIndex = parseInt((<any>drag.element).id.replace("held-card-", ""));
     drag.deckZone = drag.cardStartIndex;
 };
+
+function getMouseTile(mouseX: number, mouseY: number): BoardPosition | null {
+    let rect = gameGrid?.getBoundingClientRect();
+    let boardSize = activeClient?.board.size || 0;
+    let x = rect?.x || 0;
+    let y = rect?.y || 0;
+    let w = rect?.width || 0;
+    let h = rect?.width || 0;
+    let tileSize = w / boardSize;
+    if (mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h) {
+        let boardX = Math.floor((mouseX - x) / tileSize);
+        let boardY = Math.floor((mouseY - y) / tileSize);
+        return new BoardPosition(boardX, boardY);
+    }
+    return null;
+}
 function getMousePlayerDeckZone(mouseX: number, mouseY: number): number {
     let rect = playerDeck?.getBoundingClientRect();
     let count = playerDeck?.children.length || 1;
@@ -112,6 +134,16 @@ document.addEventListener("mouseup", (_) => {
     (<any>drag.element).style.setProperty("--y", "");
     (<any>drag.element).style.setProperty("--index", drag.deckZone.toString());
     (<any>drag.element).id = "held-card-" + drag.deckZone.toString();
+
+
+    let pos = getMouseTile(drag.mouseX, drag.mouseY);
+    if (pos) {
+        if (activeClient) {
+            let id = parseInt(drag.element?.getAttribute("entityId") || "-1");
+            let result = activeClient.sendPlayerAction(new PlaceCardPlayerAction(id, pos));
+            console.log(JSON.stringify(result));
+        }
+    }
 });
 document.addEventListener("mousemove", (event) => {
     if (!drag.active)
@@ -148,7 +180,8 @@ document.addEventListener("mousemove", (event) => {
     }
 });
 
-export function loadUi(game: Game) {
-    createGridElements(game.board.size);
-    createPlayerHandElements(<Card[]>game.players[0]?.deck);
+export function loadUi(client: Client) {
+    activeClient = client;
+    createGridElements(client.board.size);
+    createPlayerHandElements(client.player.deck);
 }

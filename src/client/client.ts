@@ -1,9 +1,15 @@
-import { cardRegistry } from "../cards";
-import { Game } from "../engine";
-import { loadUi } from "./ui";
+import { PlaceCardPlayerAction, PlayerAction, ProcessPlayerActionResult } from "../actions";
+import { BoardPosition } from "../board";
+import { Board, Player } from "../engine";
 
-let game = new Game(5);
+export class Client {
+    board: Board;
+    player: Player;
+    sendPlayerAction: (action: PlayerAction) => ProcessPlayerActionResult;
 
-console.log(cardRegistry);
-
-loadUi(game);
+    constructor(board: Board, player: Player, sendPlayerAction: (action: PlayerAction) => ProcessPlayerActionResult) {
+        this.board = board;
+        this.player = player;
+        this.sendPlayerAction = sendPlayerAction;
+    }
+}

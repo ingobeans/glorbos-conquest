@@ -55,7 +55,7 @@ class Deck {
     }
 }
 
-class Player {
+export class Player {
     deck: Card[];
     spelldeck: SpellCard[] = [];
     gold: number = 0;
@@ -101,7 +101,7 @@ class Tile {
     cards: PlacedCard[] = [];
 }
 
-class Board {
+export class Board {
     size: number;
     tiles: Tile[] = [];
     constructor(size: number) {
