@@ -70,9 +70,6 @@ function createPlayerHandElements(deck: Card[]) {
         element.appendChild(image);
 
         for (let i = 0; i < item.maxHealth / 2; i++) {
-            console.log(i);
-            console.log(item.maxHealth / 2);
-            console.log("item.maxHealth^");
             let image = document.createElement("img");
             image.classList.add("card-heart");
             image.src = "assets/graphics/heart.png";
@@ -196,11 +193,9 @@ document.addEventListener("mousemove", (event) => {
         let cardsToMove = [];
         let direction = 0;
         if (deckZone != drag.deckZone) {
-            console.log("new zone: " + deckZone);
             direction = (deckZone > drag.deckZone) ? 1 : -1;
             for (let i = drag.deckZone + direction; i != deckZone + direction; i += direction) {
                 cardsToMove.push({ element: document.getElementById("held-card-" + i.toString()), index: i });
-                console.log("move: " + i);
             }
         }
         drag.deckZone = deckZone;
