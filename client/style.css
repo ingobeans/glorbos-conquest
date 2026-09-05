@@ -29,6 +29,12 @@ body {
     background-image: url("assets/grass.png");
     background-size: cover;
     filter: brightness(1.0);
+    position: relative;
+}
+
+.tile:hover {
+    z-index: 3;
+    outline: solid 2px black;
 }
 
 .tile:nth-child(odd) {
