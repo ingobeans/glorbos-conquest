@@ -6,7 +6,7 @@ body {
 #game-grid {
     --size: 5;
     --gap: 0px;
-    --tile-size: 100px;
+    --tile-size: 10.7vh;
 
     --width: calc(var(--size) * (var(--tile-size) + var(--gap)));
     width: var(--width);
@@ -38,7 +38,7 @@ body {
 #player-deck {
     --gap: 7px;
     --count: 5;
-    --width: 130px;
+    --width: 14.5vh;
     --total-width: calc(var(--count) * (var(--width) + var(--gap)));
     width: var(--total-width);
     display: block;
@@ -48,10 +48,10 @@ body {
 }
 
 .card {
-    --width: 130px;
     background-color: rgb(255, 255, 255);
     border: solid 2px black;
     width: var(--width);
+    line-height: 0;
 }
 
 .placed-card {
@@ -73,7 +73,6 @@ body {
     --index: 0;
     --arc-factor: 0.15;
     --scale: 1.0;
-    height: 170px;
     display: inline-block;
     position: absolute;
     left: calc(var(--index) * (var(--width) + var(--gap)));
@@ -81,7 +80,7 @@ body {
     --circle-x: (var(--index) / (var(--count) - 1.0) - 0.5) * 2 * var(--arc-factor);
     --rotate: calc(asin(var(--circle-x)));
     rotate: var(--rotate);
-    top: calc(cos(asin(var(--circle-x) * 2)) * -350px + 152px);
+    top: calc(cos(asin(var(--circle-x) * 2)) * -3 * var(--width) + 1.5 * var(--width));
     transition: 0.1s;
     transform: translate(calc(var(--x) / var(--scale)), calc(var(--y) / var(--scale)));
     scale: var(--scale);
