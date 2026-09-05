@@ -6,7 +6,7 @@ body {
 #game-grid {
     --size: 5;
     --gap: 0px;
-    --tile-size: 10.7vh;
+    --tile-size: calc(min(10.7vh, 100px));
 
     --width: calc(var(--size) * (var(--tile-size) + var(--gap)));
     width: var(--width);
@@ -23,7 +23,6 @@ body {
     width: var(--tile-size);
     aspect-ratio: 1;
     background-color: #bfdb59;
-    /* outline: solid 2px black; */
     margin-left: var(--gap);
     margin-bottom: var(--gap);
     background-image: url("assets/grass.png");
@@ -44,7 +43,7 @@ body {
 #player-deck {
     --gap: 7px;
     --count: 5;
-    --width: 14.5vh;
+    --width: calc(min(14.5vh, 130px));
     --total-width: calc(var(--count) * (var(--width) + var(--gap)));
     width: var(--total-width);
     display: block;
@@ -97,7 +96,7 @@ body {
     --scale: 1.4;
     transition: 0.2s;
     transform: translate(calc(var(--x) / var(--scale)), calc(var(--y) / var(--scale) - 40px));
-    rotate: calc(var(--rotate) / 4);
+    rotate: 0deg;
 }
 
 .no-drag,
