@@ -23,7 +23,7 @@ body {
     width: var(--tile-size);
     aspect-ratio: 1;
     background-color: #bfdb59;
-    outline: solid 2px black;
+    /* outline: solid 2px black; */
     margin-left: var(--gap);
     margin-bottom: var(--gap);
     background-image: url("assets/grass.png");
