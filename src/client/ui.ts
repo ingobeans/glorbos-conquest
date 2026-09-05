@@ -22,7 +22,7 @@ function sendPlayerAction(action: PlayerAction) {
         if (!element)
             throw Error("Card to be placed not found!");
 
-        let tile = document.getElementById("tile" + result.position.toIndex(activeClient.board.size));
+        let tile = document.getElementById("tile" + activeClient.board.positionToIndex(result.position));
         if (!tile)
             throw Error("Tile not found");
 

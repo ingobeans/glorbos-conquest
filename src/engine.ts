@@ -114,6 +114,9 @@ export class Board {
     placeCardAt(card: PlacedCard, position: BoardPosition) {
         this.tiles[position.x + position.y * this.size]?.cards.push(card);
     }
+    positionToIndex(position: BoardPosition): number {
+        return position.x + position.y * this.size;
+    }
 }
 
 export class Game {
