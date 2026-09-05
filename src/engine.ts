@@ -71,6 +71,9 @@ export class Player {
         }
         return false;
     }
+    removeCard(cardEntityId: number) {
+        this.takeCard(cardEntityId);
+    }
     tryTakeCard(cardEntityId: number): Card | null {
         if (this.hasCard(cardEntityId)) {
             return this.takeCard(cardEntityId);
@@ -82,6 +85,21 @@ export class Player {
             let card = <Card>this.deck[i];
             if (card.entityId == cardEntityId) {
                 return <Card>this.deck.splice(i, 1)[0];
+            }
+        }
+        throw Error("Card doesnt exist !");
+    }
+    tryBorrowCard(cardEntityId: number): Card | null {
+        if (this.hasCard(cardEntityId)) {
+            return this.borrowCard(cardEntityId);
+        }
+        return null;
+    }
+    borrowCard(cardEntityId: number): Card {
+        for (let i = 0; i < this.deck.length; i++) {
+            let card = <Card>this.deck[i];
+            if (card.entityId == cardEntityId) {
+                return card;
             }
         }
         throw Error("Card doesnt exist !");
@@ -114,6 +132,9 @@ export class Board {
     placeCardAt(card: PlacedCard, position: BoardPosition) {
         this.tiles[position.x + position.y * this.size]?.cards.push(card);
     }
+    getTileAt(position: BoardPosition): Tile {
+        return <Tile>(this.tiles[this.positionToIndex(position)]);
+    }
     positionToIndex(position: BoardPosition): number {
         return position.x + position.y * this.size;
     }
@@ -133,11 +154,22 @@ export class Game {
     processPlayerAction(action: PlayerAction): ProcessPlayerActionResult {
         let player = <Player>this.players[this.playerTurn];
         if (action instanceof PlaceCardPlayerAction) {
-            let card = player.tryTakeCard(action.cardEntityId);
-            if (!card) {
+            let card = player.tryBorrowCard(action.cardEntityId);
+            if (!card)
                 return new ProcessPlayerActionError("Card not found");
-            }
+
             let placed = new PlacedCard(card, player);
+
+            let tile = this.board.getTileAt(action.position);
+            if (tile.cards.length > 0) {
+                let last = <PlacedCard>tile.cards[tile.cards.length - 1];
+                let canStack = last.card.canStack(last, placed);
+                if (!canStack) {
+                    return new ProcessPlayerActionError("Tile already populated");
+                }
+            }
+
+            player.removeCard(action.cardEntityId);
             this.board.placeCardAt(placed, action.position);
             return new PlaceCardServerAction(card, action.position);
         }
