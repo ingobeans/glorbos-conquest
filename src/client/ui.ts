@@ -159,21 +159,22 @@ document.addEventListener("mouseup", (_) => {
     if (!drag.active)
         return;
     drag.active = false;
-    (<any>drag.element).style.transition = "";
-    (<any>drag.element).classList.remove("dragged-card");
-    (<any>drag.element).style.setProperty("--x", "");
-    (<any>drag.element).style.setProperty("--y", "");
-    (<any>drag.element).style.setProperty("--index", drag.deckZone.toString());
-    (<any>drag.element).id = "held-card-" + drag.deckZone.toString();
 
+    (<any>drag.element).classList.remove("dragged-card");
 
     let pos = getMouseTile(drag.mouseX, drag.mouseY);
     if (pos) {
         if (activeClient) {
             let id = parseInt(drag.element?.getAttribute("entityId") || "-1");
             sendPlayerAction(new PlaceCardPlayerPacket(id, pos));
+            return;
         }
     }
+
+    (<any>drag.element).style.transition = "";
+    (<any>drag.element).style.setProperty("--x", "");
+    (<any>drag.element).style.setProperty("--y", "");
+    (<any>drag.element).style.setProperty("--index", drag.deckZone.toString());
 });
 document.addEventListener("mousemove", (event) => {
     if (!drag.active)

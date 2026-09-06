@@ -62,8 +62,11 @@ export class Player {
     deck: Card[];
     spelldeck: SpellCard[] = [];
     gold: number = 0;
-    constructor(deckSize: number, deck: Deck) {
+    playerIndex: number = 0;
+
+    constructor(deckSize: number, deck: Deck, playerIndex: number) {
         this.deck = deck.pull(deckSize);
+        this.playerIndex = playerIndex;
     }
     hasCard(cardEntityId: number): boolean {
         for (let card of this.deck) {
@@ -159,15 +162,20 @@ export class Board {
 }
 
 export class Game {
-    players: Player[];
+    players: Player[] = [];
     board: Board;
     deck: Deck;
     currentEntityID: number = 0;
     playerTurn: number = 0;
     constructor(boardSize: number) {
         this.deck = new Deck(this);
-        this.players = [new Player(5, this.deck), new Player(5, this.deck)];
         this.board = new Board(boardSize);
+        for (let i = 0; i < 2; i++)
+            this.addPlayer();
+    }
+    addPlayer() {
+        let player = new Player(5, this.deck, this.players.length);
+        this.players.push(player);
     }
     processPlayerAction(action: PlayerPacket): ServerPacket {
         let player = <Player>this.players[this.playerTurn];
