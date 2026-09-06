@@ -179,9 +179,9 @@ export class Game {
     deck: Deck;
     currentEntityID: number = 0;
     playerTurn: number = 0;
-    sendPacketCallback: (packet: ServerPacket, playerIndex: number) => void;
-    constructor(boardSize: number, sendPacketCallback: (packet: ServerPacket, playerIndex: number) => void) {
-        this.sendPacketCallback = sendPacketCallback;
+    sendPacketsCallback: (packets: ServerPacket[], playerIndex: number) => void;
+    constructor(boardSize: number, sendPacketCallback: (packets: ServerPacket[], playerIndex: number) => void) {
+        this.sendPacketsCallback = sendPacketCallback;
         this.deck = new Deck(this);
         this.board = new Board(boardSize);
         for (let i = 0; i < 2; i++)
@@ -191,10 +191,10 @@ export class Game {
         let player = new Player(5, this.deck, this.players.length);
         this.players.push(player);
     }
-    sendPacket(packet: ServerPacket, player: Player | number | undefined = undefined) {
+    sendPackets(packets: ServerPacket[], player: Player | number | undefined = undefined) {
         if (player == undefined) {
             for (let [index, _player] of this.players.entries()) {
-                this.sendPacketCallback(packet, index);
+                this.sendPacketsCallback(packets, index);
             }
             return
         }
@@ -203,7 +203,7 @@ export class Game {
             if (player == -1)
                 throw Error("Player not found");
         }
-        this.sendPacketCallback(packet, player);
+        this.sendPacketsCallback(packets, player);
     }
     processPlayerPacket(packet: PlayerPacket) {
         let player = <Player>this.players[this.playerTurn];
@@ -225,7 +225,7 @@ export class Game {
             player.removeCard(packet.cardEntityId);
             this.board.placeCardAt(placed, packet.position);
             let serverPacket = new PlaceCardServerPacket(card, packet.position);
-            this.sendPacket(serverPacket);
+            this.sendPackets([serverPacket]);
             return;
         }
         else if (packet instanceof StatePlayerPacket) {

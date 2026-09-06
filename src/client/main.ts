@@ -21,15 +21,19 @@ function sendPlayerPacket(packet: PlayerPacket) {
     console.log(client.player);
 }
 
-function sendServerPacket(packet: ServerPacket, playerIndex: number) {
-    let packetEncoded = encodePacket(packet, serverPacketRegistry);
-    let packetDecoded = decodePacket(packetEncoded, serverPacketRegistry);
-
+function sendServerPacket(packets: ServerPacket[], playerIndex: number) {
     if (playerIndex != 0)
         return;
 
-    client.receivePacket(packetDecoded);
-    handleReceivedPacket(packetDecoded);
+    function handlePacket(packet: ServerPacket) {
+        let packetEncoded = encodePacket(packet, serverPacketRegistry);
+        let packetDecoded = decodePacket(packetEncoded, serverPacketRegistry);
+
+        client.receivePacket(packetDecoded);
+        handleReceivedPacket(packetDecoded);
+    }
+
+    packets.forEach(handlePacket);
 }
 
 game = new Game(5, sendServerPacket);
