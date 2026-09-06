@@ -2,7 +2,7 @@ import { PlaceCardServerPacket, ServerPacket } from "../server_packets";
 import { BoardPosition } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
-import { Game } from "../engine";
+import { Game, PlacedCard } from "../engine";
 import { Client } from "./client";
 import { PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
 
@@ -170,9 +170,10 @@ document.addEventListener("mouseup", (_) => {
     (<any>drag.element).classList.remove("dragged-card");
 
     let pos = getMouseTile(drag.mouseX, drag.mouseY);
-    if (pos) {
-        if (activeClient) {
-            let id = parseInt(drag.element?.getAttribute("entityId") || "-1");
+    if (pos && activeClient) {
+        let id = parseInt(drag.element?.getAttribute("entityId") || "-1");
+        let placed = new PlacedCard(activeClient.player.borrowCard(id), activeClient.player);
+        if (activeClient.board.canPlaceAt(placed, pos)) {
             sendPlayerAction(new PlaceCardPlayerPacket(id, pos));
             return;
         }
