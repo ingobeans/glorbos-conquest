@@ -1,11 +1,6 @@
 import { BoardPosition } from "./board";
 import { Card } from "./cards";
 
-// This file contains definitons for all types of client/server actions (packets).
-//
-// ServerActions are packets sent from the server to clients.
-// PlayerActions are packets sent from a client to the server. These also include CardActions. The type is declared in `actions.ts`
-
 export class ErrorServerPacket {
     text: string;
     constructor(text: string) {
@@ -22,13 +17,12 @@ export class PlaceCardServerPacket {
     }
 }
 
-
 export let serverPacketRegistry = [
     ErrorServerPacket.prototype,
     PlaceCardServerPacket.prototype,
 ];
 
-// used to get the unioned type of player packets
+// used to get the unioned type of server packets
 let t = serverPacketRegistry[0];
 if (t == undefined) {
     throw Error();
