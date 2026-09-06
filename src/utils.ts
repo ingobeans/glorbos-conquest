@@ -20,4 +20,17 @@ export function clone<Type extends Object>(object: Type): Type {
     return cloned;
 }
 
+export function clamp(v: number, min: number, max: number): number {
+    return Math.max(Math.min(v, max), min);
+}
+
+export class Packet<Type> {
+    typeIndex: number;
+    value: Type;
+    constructor(typeIndex: number, value: Type) {
+        this.typeIndex = typeIndex;
+        this.value = value;
+    }
+}
+
 (<any>globalThis).clone = clone;

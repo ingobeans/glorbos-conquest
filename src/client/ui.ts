@@ -1,23 +1,24 @@
-import { PlaceCardPlayerAction, PlaceCardServerAction, PlayerAction } from "../actions";
+import { PlaceCardServerPacket } from "../server_packets";
 import { BoardPosition } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
 import { Game } from "../engine";
 import { Client } from "./client";
+import { PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
 
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
 
 export let activeClient: Client | undefined = undefined;
 
-function sendPlayerAction(action: PlayerAction) {
+function sendPlayerAction(action: PlayerPacket) {
     if (!activeClient)
         throw Error("No active client");
 
     let result = activeClient.sendPlayerAction(action);
     console.log(JSON.stringify(result));
 
-    if (result instanceof PlaceCardServerAction) {
+    if (result instanceof PlaceCardServerPacket) {
         let element = document.querySelector(`.held-card[entityId='${result.card.entityId.toString()}']`);
         if (!element)
             throw Error("Card to be placed not found!");
@@ -170,7 +171,7 @@ document.addEventListener("mouseup", (_) => {
     if (pos) {
         if (activeClient) {
             let id = parseInt(drag.element?.getAttribute("entityId") || "-1");
-            sendPlayerAction(new PlaceCardPlayerAction(id, pos));
+            sendPlayerAction(new PlaceCardPlayerPacket(id, pos));
         }
     }
 });

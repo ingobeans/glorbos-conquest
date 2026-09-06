@@ -1,9 +1,11 @@
 import { populate } from "./registry";
 import { Card, cardRegistry } from "./cards"
 import { SpellCard, spellCardRegistry } from "./spellcards"
-import { PlaceCardPlayerAction, PlaceCardServerAction, PlayerAction, ProcessPlayerActionError, ProcessPlayerActionResult, StatePlayerAction, StatePlayerActionType } from "./actions";
+import { PlaceCardServerPacket, ErrorServerPacket, ServerPacket, } from "./server_packets";
 import { BoardPosition } from "./board";
 import { clone } from "./utils";
+import { CardAction } from "./card_actions";
+import { PlaceCardPlayerPacket, PlayerPacket, StatePlayerPacket, StatePlayerPacketType } from "./player_packets";
 
 populate();
 
@@ -129,11 +131,27 @@ export class Board {
             this.tiles.push(new Tile());
         }
     }
+    positionOf(card: Card | PlacedCard): BoardPosition {
+        if (card instanceof PlacedCard) {
+            card = card.card;
+        }
+        for (let [index, tile] of this.tiles.entries()) {
+            for (let c of tile.cards) {
+                if (c.card.entityId == card.entityId) {
+                    return this.indexToPosition(index);
+                }
+            }
+        }
+        throw Error("Card not found");
+    }
     placeCardAt(card: PlacedCard, position: BoardPosition) {
         this.tiles[position.x + position.y * this.size]?.cards.push(card);
     }
     getTileAt(position: BoardPosition): Tile {
         return <Tile>(this.tiles[this.positionToIndex(position)]);
+    }
+    indexToPosition(index: number): BoardPosition {
+        return new BoardPosition(index % this.size, Math.floor(index / this.size));
     }
     positionToIndex(position: BoardPosition): number {
         return position.x + position.y * this.size;
@@ -151,12 +169,13 @@ export class Game {
         this.players = [new Player(5, this.deck), new Player(5, this.deck)];
         this.board = new Board(boardSize);
     }
-    processPlayerAction(action: PlayerAction): ProcessPlayerActionResult {
+    processPlayerAction(action: PlayerPacket): ServerPacket {
         let player = <Player>this.players[this.playerTurn];
-        if (action instanceof PlaceCardPlayerAction) {
+        if (action instanceof CardAction) { }
+        else if (action instanceof PlaceCardPlayerPacket) {
             let card = player.tryBorrowCard(action.cardEntityId);
             if (!card)
-                return new ProcessPlayerActionError("Card not found");
+                return new ErrorServerPacket("Card not found");
 
             let placed = new PlacedCard(card, player);
 
@@ -165,21 +184,23 @@ export class Game {
                 let last = <PlacedCard>tile.cards[tile.cards.length - 1];
                 let canStack = last.card.canStack(last, placed);
                 if (!canStack) {
-                    return new ProcessPlayerActionError("Tile already populated");
+                    return new ErrorServerPacket("Tile already populated");
                 }
             }
 
             player.removeCard(action.cardEntityId);
             this.board.placeCardAt(placed, action.position);
-            return new PlaceCardServerAction(card, action.position);
+            return new PlaceCardServerPacket(card, action.position);
         }
-        else if (action instanceof StatePlayerAction) {
+        else if (action instanceof StatePlayerPacket) {
             switch (action.type) {
-                case StatePlayerActionType.EndTurn:
+                case StatePlayerPacketType.EndTurn:
                     this.playerTurn = (this.playerTurn + 1) % this.players.length;
                     break;
             }
+        } else {
+            return new ErrorServerPacket("Unknown packet");
         }
-        return new ProcessPlayerActionError("placeholder");
+        return new ErrorServerPacket("placeholder");
     }
 }
