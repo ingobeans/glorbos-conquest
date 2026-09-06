@@ -153,6 +153,18 @@ export class Board {
     getTileAt(position: BoardPosition): Tile {
         return <Tile>(this.tiles[this.positionToIndex(position)]);
     }
+    canPlaceAt(placedCard: PlacedCard, position: BoardPosition): boolean {
+        let tile = this.getTileAt(position);
+        if (tile.cards.length > 0) {
+            let last = <PlacedCard>tile.cards[tile.cards.length - 1];
+            let canStack = last.card.canStack(last, placedCard);
+            if (!canStack) {
+                return false;
+            }
+
+        }
+        return true
+    }
     indexToPosition(index: number): BoardPosition {
         return new BoardPosition(index % this.size, Math.floor(index / this.size));
     }
@@ -167,7 +179,9 @@ export class Game {
     deck: Deck;
     currentEntityID: number = 0;
     playerTurn: number = 0;
-    constructor(boardSize: number) {
+    sendPacketCallback: (packet: ServerPacket, playerIndex: number) => void;
+    constructor(boardSize: number, sendPacketCallback: (packet: ServerPacket, playerIndex: number) => void) {
+        this.sendPacketCallback = sendPacketCallback;
         this.deck = new Deck(this);
         this.board = new Board(boardSize);
         for (let i = 0; i < 2; i++)
@@ -177,38 +191,53 @@ export class Game {
         let player = new Player(5, this.deck, this.players.length);
         this.players.push(player);
     }
-    processPlayerAction(action: PlayerPacket): ServerPacket {
+    sendPacket(packet: ServerPacket, player: Player | number | undefined = undefined) {
+        if (player == undefined) {
+            for (let [index, _player] of this.players.entries()) {
+                this.sendPacketCallback(packet, index);
+            }
+            return
+        }
+        if (player instanceof Player) {
+            player = this.players.indexOf(player);
+            if (player == -1)
+                throw Error("Player not found");
+        }
+        this.sendPacketCallback(packet, player);
+    }
+    processPlayerPacket(packet: PlayerPacket) {
         let player = <Player>this.players[this.playerTurn];
-        if (action instanceof CardAction) { }
-        else if (action instanceof PlaceCardPlayerPacket) {
-            let card = player.tryBorrowCard(action.cardEntityId);
-            if (!card)
-                return new ErrorServerPacket("Card not found");
+        if (packet instanceof CardAction) { }
+        else if (packet instanceof PlaceCardPlayerPacket) {
+            let card = player.tryBorrowCard(packet.cardEntityId);
+            if (!card) {
+                console.warn("Card not found");
+                return;
+            }
 
             let placed = new PlacedCard(card, player);
 
-            let tile = this.board.getTileAt(action.position);
-            if (tile.cards.length > 0) {
-                let last = <PlacedCard>tile.cards[tile.cards.length - 1];
-                let canStack = last.card.canStack(last, placed);
-                if (!canStack) {
-                    return new ErrorServerPacket("Tile already populated");
-                }
+            if (!this.board.canPlaceAt(placed, packet.position)) {
+                console.warn("Tile already populated");
+                return;
             }
 
-            player.removeCard(action.cardEntityId);
-            this.board.placeCardAt(placed, action.position);
-            return new PlaceCardServerPacket(card, action.position);
+            player.removeCard(packet.cardEntityId);
+            this.board.placeCardAt(placed, packet.position);
+            let serverPacket = new PlaceCardServerPacket(card, packet.position);
+            this.sendPacket(serverPacket);
+            return;
         }
-        else if (action instanceof StatePlayerPacket) {
-            switch (action.type) {
+        else if (packet instanceof StatePlayerPacket) {
+            switch (packet.type) {
                 case StatePlayerPacketType.EndTurn:
                     this.playerTurn = (this.playerTurn + 1) % this.players.length;
                     break;
             }
         } else {
-            return new ErrorServerPacket("Unknown packet");
+            console.warn("Unknown packet");
+            return
         }
-        return new ErrorServerPacket("placeholder");
+        return;
     }
 }

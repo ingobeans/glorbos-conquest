@@ -1,28 +1,40 @@
-import { cardRegistry } from "../cards";
+import { Card, cardRegistry } from "../cards";
 import { Game, Player } from "../engine";
 import { PlayerPacket, playerPacketsRegistry } from "../player_packets";
 import { ServerPacket, serverPacketRegistry } from "../server_packets";
-import { clone, decodePacket, EncodedPacket, encodePacket } from "../utils";
+import { clone, decodePacket, encodePacket } from "../utils";
 import { Client } from "./client";
 import { loadUi } from "./ui";
 
-let game = new Game(5);
-function callback(playerPacket: PlayerPacket): ServerPacket {
+let game: Game;
+let client: Client;
+let handleReceivedPacket: (packet: ServerPacket) => void;
+
+function sendPlayerPacket(packet: PlayerPacket) {
     // encode and re-decode packets to simulate network transmission
     // for the sake of ensuring parity.
 
-    let packetEncoded = encodePacket(playerPacket, playerPacketsRegistry);
-    let decodedPacket = decodePacket(packetEncoded, playerPacketsRegistry);
+    let packetEncoded = encodePacket(packet, playerPacketsRegistry);
+    let packetDecoded = decodePacket(packetEncoded, playerPacketsRegistry);
 
-    let receivedPacket = game.processPlayerAction(decodedPacket);
-    let receivedPacketEncoded = encodePacket(receivedPacket, serverPacketRegistry);
-    let receivedPacketDecoded = decodePacket(receivedPacketEncoded, serverPacketRegistry);
-
-    return receivedPacketDecoded;
-
+    game.processPlayerPacket(packetDecoded);
+    console.log(client.player);
 }
-let client = new Client(clone(game.board), clone(<Player>game.players[0]), callback);
+
+function sendServerPacket(packet: ServerPacket, playerIndex: number) {
+    let packetEncoded = encodePacket(packet, serverPacketRegistry);
+    let packetDecoded = decodePacket(packetEncoded, serverPacketRegistry);
+
+    if (playerIndex != 0)
+        return;
+
+    client.receivePacket(packetDecoded);
+    handleReceivedPacket(packetDecoded);
+}
+
+game = new Game(5, sendServerPacket);
+client = new Client(clone(game.board), clone(<Player>game.players[0]), sendPlayerPacket);
 
 console.log(cardRegistry);
 
-loadUi(client);
+handleReceivedPacket = loadUi(client);

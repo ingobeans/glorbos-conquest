@@ -1,4 +1,4 @@
-import { PlaceCardServerPacket } from "../server_packets";
+import { PlaceCardServerPacket, ServerPacket } from "../server_packets";
 import { BoardPosition } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
@@ -15,15 +15,21 @@ function sendPlayerAction(action: PlayerPacket) {
     if (!activeClient)
         throw Error("No active client");
 
-    let result = activeClient.sendPlayerAction(action);
-    console.log(JSON.stringify(result));
+    activeClient.sendPlayerAction(action);
+}
 
-    if (result instanceof PlaceCardServerPacket) {
-        let element = document.querySelector(`.held-card[entityId='${result.card.entityId.toString()}']`);
+function handleReceivedPacket(packet: ServerPacket) {
+    if (!activeClient)
+        throw Error("No active client");
+
+    console.log(JSON.stringify(packet));
+
+    if (packet instanceof PlaceCardServerPacket) {
+        let element = document.querySelector(`.held-card[entityId='${packet.card.entityId.toString()}']`);
         if (!element)
             throw Error("Card to be placed not found!");
 
-        let tile = document.getElementById("tile" + activeClient.board.positionToIndex(result.position));
+        let tile = document.getElementById("tile" + activeClient.board.positionToIndex(packet.position));
         if (!tile)
             throw Error("Tile not found");
 
@@ -34,6 +40,7 @@ function sendPlayerAction(action: PlayerPacket) {
         tile.appendChild(element);
         let startIndex = parseInt(element.id.replace("held-card-", ""));
         for (let i = startIndex; i <= activeClient.player.deck.length; i++) {
+            console.log(i);
             let e = <any>document.getElementById("held-card-" + i.toString());
             e.id = "held-card-" + (i - 1).toString();
             e.style.setProperty("--index", (i - 1).toString());
@@ -209,8 +216,9 @@ document.addEventListener("mousemove", (event) => {
     }
 });
 
-export function loadUi(client: Client) {
+export function loadUi(client: Client): (packet: ServerPacket) => void {
     activeClient = client;
     createGridElements(client.board.size);
     createPlayerHandElements(client.player.deck);
+    return handleReceivedPacket;
 }
