@@ -113,11 +113,13 @@ export class Player {
 
 export class PlacedCard {
     card: Card;
-    owner: Player;
+    ownerIndex: number;
 
-    constructor(card: Card, owner: Player) {
+    constructor(card: Card, owner: number | Player) {
+        if (owner instanceof Player)
+            owner = owner.playerIndex;
         this.card = card;
-        this.owner = owner;
+        this.ownerIndex = owner;
     }
 }
 
