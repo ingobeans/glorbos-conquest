@@ -3,9 +3,9 @@ import { Card, cardRegistry } from "./cards"
 import { SpellCard, spellCardRegistry } from "./spellcards"
 import { PlaceCardServerPacket, ErrorServerPacket, ServerPacket, } from "./server_packets";
 import { BoardPosition } from "./board";
-import { clone } from "./utils";
-import { CardAction } from "./card_actions";
-import { PlaceCardPlayerPacket, PlayerPacket, StatePlayerPacket, StatePlayerPacketType } from "./player_packets";
+import { clone, decodePacket } from "./utils";
+import { CardAction, cardActionsRegistry, TileHighlightColor } from "./card_actions";
+import { CardActionPlayerPacket, PlaceCardPlayerPacket, PlayerPacket, StatePlayerPacket, StatePlayerPacketType } from "./player_packets";
 
 populate();
 
@@ -145,18 +145,38 @@ export class Board {
             this.tiles.push(new Tile());
         }
     }
-    positionOf(card: Card | PlacedCard): BoardPosition {
+    getHighlightedTiles(placedCard: PlacedCard, player: Player) {
+        let highlights: [BoardPosition, TileHighlightColor][] = [];
+        for (let action of placedCard.card.actions) {
+            if (action.available(this, placedCard, player)) {
+                let tiles = action.highlightsTiles(this, placedCard, player);
+                highlights = highlights.concat(tiles);
+            }
+        }
+        return highlights;
+    }
+    findCardOnBoard(card: Card | PlacedCard | number): { placedCard: PlacedCard, topOfTile: boolean, tile: Tile, position: BoardPosition } {
         if (card instanceof PlacedCard) {
-            card = card.card;
+            card = card.card.entityId;
+        } else if (card instanceof Card) {
+            card = card.entityId;
         }
         for (let [index, tile] of this.tiles.entries()) {
-            for (let c of tile.cards) {
-                if (c.card.entityId == card.entityId) {
-                    return this.indexToPosition(index);
+            for (let [cardIndex, c] of tile.cards.entries()) {
+                if (c.card.entityId == card) {
+                    return {
+                        placedCard: c,
+                        topOfTile: cardIndex == tile.cards.length - 1,
+                        position: this.indexToPosition(index),
+                        tile: tile,
+                    }
                 }
             }
         }
         throw Error("Card not found");
+    }
+    positionOf(card: Card | PlacedCard | number): BoardPosition {
+        return this.findCardOnBoard(card).position;
     }
     placeCardAt(card: PlacedCard, position: BoardPosition) {
         this.tiles[position.x + position.y * this.size]?.cards.push(card);
@@ -218,7 +238,13 @@ export class Game {
     }
     processPlayerPacket(packet: PlayerPacket) {
         let player = <Player>this.players[this.playerTurn];
-        if (packet instanceof CardAction) { }
+        if (packet instanceof CardActionPlayerPacket) {
+            let placedCard = this.board.findCardOnBoard(packet.cardEntityId).placedCard;
+            let cardAction: CardAction = decodePacket(packet.cardActionPacket, cardActionsRegistry);
+            if (cardAction.available(this.board, placedCard, player)) {
+                cardAction.use(this, placedCard, player);
+            }
+        }
         else if (packet instanceof PlaceCardPlayerPacket) {
             let card = player.tryBorrowCard(packet.cardEntityId);
             if (!card) {

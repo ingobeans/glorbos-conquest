@@ -8,6 +8,9 @@ export class BoardPosition {
         this.x = x;
         this.y = y;
     }
+    equals(other: BoardPosition): boolean {
+        return this.x == other.x && this.y == other.y
+    }
     toIndex(boardSize: number): number {
         return this.x + this.y * boardSize;
     }

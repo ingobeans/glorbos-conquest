@@ -33,6 +33,17 @@ export class EncodedPacket<Type> {
     }
 }
 
+export function createEncodedPacket<Type extends Object>(data: Type, registry: any[]): EncodedPacket<Type> {
+    let index = -1;
+    for (let [i, ty] of registry.entries()) {
+        if (data instanceof ty.constructor) {
+            index = i;
+        }
+    }
+    let packet = new EncodedPacket(index, data);
+    return packet;
+}
+
 export function encodePacket(data: Object, registry: any[]): string {
     let index = -1;
     for (let [i, ty] of registry.entries()) {
@@ -45,13 +56,18 @@ export function encodePacket(data: Object, registry: any[]): string {
     return packetEncoded;
 }
 
-export function decodePacket<Type>(encoded: string, registry: Type[]): Type {
-    let decodedPacket = <EncodedPacket<Object>>JSON.parse(encoded);
-    let type = registry[decodedPacket.typeIndex];
+export function decodePacket<Type>(encoded: string | EncodedPacket<Type>, registry: Type[]): Type {
+    let encodedPacket: EncodedPacket<Type>;
+    if (typeof encoded == "string") {
+        encodedPacket = <EncodedPacket<Type>>JSON.parse(encoded);
+    } else {
+        encodedPacket = encoded;
+    }
+    let type = registry[encodedPacket.typeIndex];
     if (!type)
         throw Error("bad packet");
 
-    let extractedPacket = Object.setPrototypeOf(decodedPacket.value, type);
+    let extractedPacket = Object.setPrototypeOf(encodedPacket.value, type);
     return extractedPacket;
 }
 

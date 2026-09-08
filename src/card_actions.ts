@@ -60,3 +60,4 @@ export class MoveCardAction extends TargetedCardAction {
 export let cardActionsRegistry = [
     MoveCardAction.prototype
 ];
+console.log(cardActionsRegistry);

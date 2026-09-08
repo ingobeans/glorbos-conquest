@@ -1,4 +1,6 @@
 import { BoardPosition } from "./board";
+import { CardAction, cardActionsRegistry } from "./card_actions";
+import { createEncodedPacket, EncodedPacket } from "./utils";
 
 export enum StatePlayerPacketType {
     EndTurn,
@@ -18,14 +20,12 @@ export class PlaceCardPlayerPacket {
         this.position = position;
     }
 }
-export class CardActionPlayerPacket<Type extends Object> {
+export class CardActionPlayerPacket<Type extends CardAction> {
     cardEntityId: number;
-    cardActionIndex: number;
-    cardActionData: Type;
-    constructor(cardEntityId: number, cardActionIndex: number, cardActionData: Type) {
+    cardActionPacket: EncodedPacket<Type>;
+    constructor(cardEntityId: number, cardAction: Type) {
         this.cardEntityId = cardEntityId;
-        this.cardActionIndex = cardActionIndex;
-        this.cardActionData = cardActionData;
+        this.cardActionPacket = createEncodedPacket(cardAction, cardActionsRegistry);
     }
 }
 

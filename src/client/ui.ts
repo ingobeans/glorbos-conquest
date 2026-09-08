@@ -4,8 +4,8 @@ import { Card } from "../cards";
 import { ElementType } from "../elements";
 import { Game, PlacedCard } from "../engine";
 import { Client } from "./client";
-import { PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
-import { TileHighlightColor } from "../card_actions";
+import { CardActionPlayerPacket, PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
+import { CardAction, TargetedCardAction, TileHighlightColor } from "../card_actions";
 
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
@@ -13,7 +13,7 @@ let tilesHighlight = document.getElementById("tiles-highlight");
 
 export let activeClient: Client | undefined = undefined;
 
-function sendPlayerAction(action: PlayerPacket) {
+function sendPlayerPacket(action: PlayerPacket) {
     if (!activeClient)
         throw Error("No active client");
 
@@ -86,18 +86,44 @@ function createGridElements(size: number) {
 }
 
 let selectedTile = {
-    card: <Card | null>null,
+    placedCard: <PlacedCard | null>null,
     position: <BoardPosition | null>null,
 };
 function stopSelectingTile() {
     selectedTile.position = null;
-    selectedTile.card = null;
+    selectedTile.placedCard = null;
     highlightTiles([]);
 }
 function clickTile(element: HTMLDivElement) {
     if (!activeClient)
         return;
     let id = parseInt(element.id.replace("tile", ""));
+    let position = activeClient.board.indexToPosition(id);
+
+    if (selectedTile.placedCard) {
+        let pressedAction: CardAction | null = null;
+        for (let action of selectedTile.placedCard.card.actions) {
+            if (action.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
+                let tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
+                for (let tile of tiles) {
+                    if (tile[0].equals(position)) {
+                        pressedAction = action;
+                    }
+                }
+            }
+        }
+        if (pressedAction) {
+            if (pressedAction instanceof TargetedCardAction) {
+                let instance = new (<any>pressedAction).constructor(position);
+                sendPlayerPacket(new CardActionPlayerPacket(
+                    selectedTile.placedCard.card.entityId,
+                    instance
+                ));
+            }
+            return;
+        }
+    }
+
     let placedCard = activeClient.board.tiles[id]?.tryGetLast();
     if (!placedCard) {
         stopSelectingTile();
@@ -107,16 +133,8 @@ function clickTile(element: HTMLDivElement) {
         stopSelectingTile();
         return;
     }
-    let card = placedCard.card;
-    selectedTile = { card: card, position: activeClient.board.indexToPosition(id) };
-    let highlights: [BoardPosition, TileHighlightColor][] = [];
-    for (let action of card.actions) {
-        if (action.available(activeClient.board, placedCard, activeClient.player)) {
-            let tiles = action.highlightsTiles(activeClient.board, placedCard, activeClient.player);
-            highlights = highlights.concat(tiles);
-        }
-    }
-    highlightTiles(highlights);
+    selectedTile = { placedCard: placedCard, position: position };
+    highlightTiles(activeClient.board.getHighlightedTiles(placedCard, activeClient.player));
 }
 
 function createPlayerHandElements(deck: Card[]) {
@@ -233,7 +251,7 @@ document.addEventListener("mouseup", (_) => {
         let id = parseInt(drag.element?.getAttribute("entityId") || "-1");
         let placed = new PlacedCard(activeClient.player.borrowCard(id), activeClient.player);
         if (activeClient.board.canPlaceAt(placed, pos)) {
-            sendPlayerAction(new PlaceCardPlayerPacket(id, pos));
+            sendPlayerPacket(new PlaceCardPlayerPacket(id, pos));
             return;
         }
     }
