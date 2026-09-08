@@ -55,6 +55,7 @@ function handleReceivedPacket(packet: ServerPacket) {
         if (!element)
             throw Error("Card not found");
         newTile?.appendChild(element);
+        clickTile(<HTMLDivElement>newTile);
     }
 
     else {
@@ -104,11 +105,19 @@ function stopSelectingTile() {
     selectedTile.placedCard = null;
     highlightTiles([]);
 }
-function clickTile(element: HTMLDivElement) {
+function clickTile(element: HTMLDivElement | BoardPosition) {
     if (!activeClient)
         return;
-    let id = parseInt(element.id.replace("tile", ""));
-    let position = activeClient.board.indexToPosition(id);
+    let id;
+    let position;
+
+    if (element instanceof HTMLDivElement) {
+        id = parseInt(element.id.replace("tile", ""));
+        position = activeClient.board.indexToPosition(id);
+    } else {
+        position = element;
+        id = activeClient.board.positionToIndex(position);
+    }
 
     if (selectedTile.placedCard) {
         let pressedAction: CardAction | null = null;
@@ -123,10 +132,13 @@ function clickTile(element: HTMLDivElement) {
             }
         }
         if (pressedAction) {
+            let s = selectedTile.placedCard;
+            highlightTiles([]);
+            stopSelectingTile();
             if (pressedAction instanceof TargetedCardAction) {
                 let instance = new (<any>pressedAction).constructor(position);
                 sendPlayerPacket(new CardActionPlayerPacket(
-                    selectedTile.placedCard.card.entityId,
+                    s.card.entityId,
                     instance
                 ));
             }
