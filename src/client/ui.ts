@@ -132,13 +132,10 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
             }
         }
         if (pressedAction) {
-            let s = selectedTile.placedCard;
-            highlightTiles([]);
-            stopSelectingTile();
             if (pressedAction instanceof TargetedCardAction) {
                 let instance = new (<any>pressedAction).constructor(position);
                 sendPlayerPacket(new CardActionPlayerPacket(
-                    s.card.entityId,
+                    selectedTile.placedCard.card.entityId,
                     instance
                 ));
             }
