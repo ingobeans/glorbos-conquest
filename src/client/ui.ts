@@ -67,12 +67,6 @@ function highlightTiles(tiles: [BoardPosition, string][]) {
         tilesHighlight.appendChild(element);
     }
 }
-let t: [BoardPosition, string][] = [];
-for (let c of [0, 1, 2, 3, 4]) {
-    t.push([new BoardPosition(c, 0), "#ff0000"]);
-    t.push([new BoardPosition(c, 2), "#ff0000"]);
-}
-highlightTiles(t);
 
 function createGridElements(size: number) {
     gameGrid?.style.setProperty("--size", size.toString());
@@ -137,11 +131,11 @@ let drag = {
     startX: 0,
     startY: 0,
     deckZone: -1,
-    element: <Element | null>null,
+    element: <HTMLDivElement | null>null,
     active: false,
     cardStartIndex: 0,
 };
-function cardMouseDown(element: any, event: MouseEvent) {
+function cardMouseDown(element: HTMLDivElement, event: MouseEvent) {
     drag.startX = event.clientX;
     drag.startY = event.clientY;
     drag.mouseX = event.clientX;
@@ -150,7 +144,7 @@ function cardMouseDown(element: any, event: MouseEvent) {
     drag.active = true;
     element.style.transition = "0s";
     element.classList.add("dragged-card");
-    drag.cardStartIndex = parseInt((<any>drag.element).id.replace("held-card-", ""));
+    drag.cardStartIndex = parseInt(drag.element.id.replace("held-card-", ""));
     drag.deckZone = drag.cardStartIndex;
 };
 
@@ -191,7 +185,7 @@ document.addEventListener("mouseup", (_) => {
         return;
     drag.active = false;
 
-    (<any>drag.element).classList.remove("dragged-card");
+    drag.element?.classList.remove("dragged-card");
 
     let pos = getMouseTile(drag.mouseX, drag.mouseY);
     if (pos && activeClient) {
@@ -203,10 +197,10 @@ document.addEventListener("mouseup", (_) => {
         }
     }
 
-    (<any>drag.element).style.transition = "";
-    (<any>drag.element).style.setProperty("--x", "");
-    (<any>drag.element).style.setProperty("--y", "");
-    (<any>drag.element).style.setProperty("--index", drag.deckZone.toString());
+    (<HTMLDivElement>drag.element).style.transition = "";
+    drag.element?.style.setProperty("--x", "");
+    drag.element?.style.setProperty("--y", "");
+    drag.element?.style.setProperty("--index", drag.deckZone.toString());
 });
 document.addEventListener("mousemove", (event) => {
     if (!drag.active)
@@ -215,10 +209,11 @@ document.addEventListener("mousemove", (event) => {
     drag.mouseY = event.clientY;
     let deltaX = drag.mouseX - drag.startX;
     let deltaY = drag.mouseY - drag.startY;
-    if (drag.element) {
-        (<any>drag.element).style.setProperty("--x", deltaX.toString() + "px");
-        (<any>drag.element).style.setProperty("--y", deltaY.toString() + "px");
-    }
+    if (!drag.element)
+        return;
+
+    drag.element.style.setProperty("--x", deltaX.toString() + "px");
+    drag.element.style.setProperty("--y", deltaY.toString() + "px");
 
     // find if card is being reordered in deck
     let deckZone = getMousePlayerDeckZone(drag.mouseX, drag.mouseY);
@@ -229,15 +224,20 @@ document.addEventListener("mousemove", (event) => {
         if (deckZone != drag.deckZone) {
             direction = (deckZone > drag.deckZone) ? 1 : -1;
             for (let i = drag.deckZone + direction; i != deckZone + direction; i += direction) {
-                cardsToMove.push({ element: document.getElementById("held-card-" + i.toString()), index: i });
+                let e = document.getElementById("held-card-" + i.toString());
+                if (!e) {
+                    console.error("held-card-i" + i.toString() + " not found");
+                    continue;
+                }
+                cardsToMove.push({ element: e, index: i });
             }
         }
         drag.deckZone = deckZone;
         for (let item of cardsToMove) {
-            item.element?.style.setProperty("--index", (item.index - direction).toString());
-            (<any>item.element).id = "held-card-" + (item.index - direction).toString();
+            item.element.style.setProperty("--index", (item.index - direction).toString());
+            item.element.id = "held-card-" + (item.index - direction).toString();
         }
-        (<any>drag.element).id = "held-card-" + deckZone.toString();
+        drag.element.id = "held-card-" + deckZone.toString();
     }
 });
 
