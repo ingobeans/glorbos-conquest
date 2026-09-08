@@ -1,6 +1,11 @@
 import { BoardPosition } from "./board";
 import { Board, Game, PlacedCard, Player } from "./engine";
 
+export enum TileHighlightColor {
+    Blue,
+    Red,
+}
+
 export class CardAction {
     name: string = "unknown";
     icon: string = "placeholder";
@@ -15,7 +20,7 @@ export class CardAction {
      * Should return tiles that should be highlighted when this action is previewed.
      * Returns a list of tile indexes with the color for the highlight in hex.
     */
-    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, string][] {
+    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
         return [];
     }
 
@@ -33,8 +38,8 @@ export class TargetedCardAction extends CardAction {
 
 export class MoveCardAction extends TargetedCardAction {
     name = "Move";
-    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, string][] {
-        let tiles: [BoardPosition, string][] = [];
+    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
+        let tiles: [BoardPosition, TileHighlightColor][] = [];
         let directions: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
         let position = board.positionOf(card);
         for (let direction of directions) {
@@ -45,7 +50,7 @@ export class MoveCardAction extends TargetedCardAction {
             if (!board.canPlaceAt(card, newPos)) {
                 continue;
             }
-            tiles.push([newPos, "#fff"]);
+            tiles.push([newPos, TileHighlightColor.Blue]);
         }
 
         return tiles;

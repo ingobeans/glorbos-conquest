@@ -131,14 +131,15 @@ body {
 .highlight-tile {
     --x: 0;
     --y: 0;
-    --c: #000;
-    z-index: 2;
+    --c: 0deg;
+    z-index: 4;
     position: absolute;
     left: calc(var(--x) * var(--tile-size));
     top: calc(var(--y) * var(--tile-size));
     width: var(--tile-size);
     height: var(--tile-size);
-    outline: solid 1px white;
-    filter: drop-shadow(0 0 2px var(--c)) drop-shadow(0 0 2px var(--c));
     pointer-events: none;
+    background-image: url("assets/target.png");
+    background-size: cover;
+    filter: hue-rotate(var(--c));
 }

@@ -5,6 +5,7 @@ import { ElementType } from "../elements";
 import { Game, PlacedCard } from "../engine";
 import { Client } from "./client";
 import { PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
+import { TileHighlightColor } from "../card_actions";
 
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
@@ -51,7 +52,12 @@ function handleReceivedPacket(packet: ServerPacket) {
     }
 }
 
-function highlightTiles(tiles: [BoardPosition, string][]) {
+let highlightColorToHueRotate = {
+    [TileHighlightColor.Blue]: 0,
+    [TileHighlightColor.Red]: 190,
+}
+
+function highlightTiles(tiles: [BoardPosition, TileHighlightColor][]) {
     if (!tilesHighlight?.children)
         throw Error();
 
@@ -63,7 +69,7 @@ function highlightTiles(tiles: [BoardPosition, string][]) {
         element.className = "highlight-tile";
         element.style.setProperty("--x", tile[0].x.toString());
         element.style.setProperty("--y", tile[0].y.toString());
-        element.style.setProperty("--c", tile[1]);
+        element.style.setProperty("--c", highlightColorToHueRotate[tile[1]].toString() + "deg");
         tilesHighlight.appendChild(element);
     }
 }
@@ -103,7 +109,7 @@ function tileClick(element: HTMLDivElement) {
     }
     let card = tile.card;
     selectedTile = { card: card, position: activeClient.board.indexToPosition(id) };
-    let highlights: [BoardPosition, string][] = [];
+    let highlights: [BoardPosition, TileHighlightColor][] = [];
     for (let action of card.actions) {
         if (action.available(activeClient.board, tile, activeClient.player)) {
             let tiles = action.highlightsTiles(activeClient.board, tile, activeClient.player);
