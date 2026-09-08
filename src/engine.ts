@@ -125,6 +125,15 @@ export class PlacedCard {
 
 class Tile {
     cards: PlacedCard[] = [];
+    tryGetLast(): PlacedCard | undefined {
+        return this.cards[this.cards.length - 1];
+    }
+    getLast(): PlacedCard {
+        let l = this.tryGetLast();
+        if (l == undefined)
+            throw Error("Tile.getLast() failed because tile has no cards");
+        return l;
+    }
 }
 
 export class Board {

@@ -74,8 +74,29 @@ function createGridElements(size: number) {
         let element = document.createElement("div");
         element.classList.add("tile");
         element.id = "tile" + i;
+        element.onclick = tileClick.bind(null, element);
         gameGrid?.append(element);
     }
+}
+
+let selectedTile = {
+    card: <Card | null>null,
+    position: <BoardPosition | null>null,
+};
+function tileClick(element: HTMLDivElement) {
+    if (!activeClient)
+        return;
+    let id = parseInt(element.id.replace("tile", ""));
+    let tile = activeClient.board.tiles[id]?.tryGetLast();
+    if (!tile) {
+        selectedTile.position = null;
+        return;
+    }
+    if (tile.ownerIndex != activeClient.player.playerIndex) {
+        selectedTile.position = null;
+        return;
+    }
+    selectedTile = { card: tile.card, position: activeClient.board.indexToPosition(id) };
 }
 
 function createPlayerHandElements(deck: Card[]) {
