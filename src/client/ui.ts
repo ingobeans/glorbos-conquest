@@ -80,7 +80,7 @@ function createGridElements(size: number) {
         let element = document.createElement("div");
         element.classList.add("tile");
         element.id = "tile" + i;
-        element.onclick = tileClick.bind(null, element);
+        element.onclick = clickTile.bind(null, element);
         gameGrid?.append(element);
     }
 }
@@ -94,25 +94,25 @@ function stopSelectingTile() {
     selectedTile.card = null;
     highlightTiles([]);
 }
-function tileClick(element: HTMLDivElement) {
+function clickTile(element: HTMLDivElement) {
     if (!activeClient)
         return;
     let id = parseInt(element.id.replace("tile", ""));
-    let tile = activeClient.board.tiles[id]?.tryGetLast();
-    if (!tile) {
+    let placedCard = activeClient.board.tiles[id]?.tryGetLast();
+    if (!placedCard) {
         stopSelectingTile();
         return;
     }
-    if (tile.ownerIndex != activeClient.player.playerIndex) {
+    if (placedCard.ownerIndex != activeClient.player.playerIndex) {
         stopSelectingTile();
         return;
     }
-    let card = tile.card;
+    let card = placedCard.card;
     selectedTile = { card: card, position: activeClient.board.indexToPosition(id) };
     let highlights: [BoardPosition, TileHighlightColor][] = [];
     for (let action of card.actions) {
-        if (action.available(activeClient.board, tile, activeClient.player)) {
-            let tiles = action.highlightsTiles(activeClient.board, tile, activeClient.player);
+        if (action.available(activeClient.board, placedCard, activeClient.player)) {
+            let tiles = action.highlightsTiles(activeClient.board, placedCard, activeClient.player);
             highlights = highlights.concat(tiles);
         }
     }
