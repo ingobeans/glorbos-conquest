@@ -53,10 +53,10 @@ function handleReceivedPacket(packet: ServerPacket) {
 
 function highlightTiles(tiles: [BoardPosition, string][]) {
     if (!tilesHighlight?.children)
-        throw Error;
+        throw Error();
 
-    for (let child of tilesHighlight?.children) {
-        child.remove();
+    while (tilesHighlight.children[0]) {
+        tilesHighlight.children[0].remove();
     }
     for (let tile of tiles) {
         let element = document.createElement("div");
@@ -83,20 +83,34 @@ let selectedTile = {
     card: <Card | null>null,
     position: <BoardPosition | null>null,
 };
+function stopSelectingTile() {
+    selectedTile.position = null;
+    selectedTile.card = null;
+    highlightTiles([]);
+}
 function tileClick(element: HTMLDivElement) {
     if (!activeClient)
         return;
     let id = parseInt(element.id.replace("tile", ""));
     let tile = activeClient.board.tiles[id]?.tryGetLast();
     if (!tile) {
-        selectedTile.position = null;
+        stopSelectingTile();
         return;
     }
     if (tile.ownerIndex != activeClient.player.playerIndex) {
-        selectedTile.position = null;
+        stopSelectingTile();
         return;
     }
-    selectedTile = { card: tile.card, position: activeClient.board.indexToPosition(id) };
+    let card = tile.card;
+    selectedTile = { card: card, position: activeClient.board.indexToPosition(id) };
+    let highlights: [BoardPosition, string][] = [];
+    for (let action of card.actions) {
+        if (action.available(activeClient.board, tile, activeClient.player)) {
+            let tiles = action.highlightsTiles(activeClient.board, tile, activeClient.player);
+            highlights = highlights.concat(tiles);
+        }
+    }
+    highlightTiles(highlights);
 }
 
 function createPlayerHandElements(deck: Card[]) {

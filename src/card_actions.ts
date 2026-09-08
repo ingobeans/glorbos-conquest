@@ -42,7 +42,7 @@ export class MoveCardAction extends TargetedCardAction {
             if (newPos.isOutsideBoard(board)) {
                 continue;
             }
-            tiles.push([newPos, "#ff0000"]);
+            tiles.push([newPos, "#fff"]);
         }
 
         return tiles;

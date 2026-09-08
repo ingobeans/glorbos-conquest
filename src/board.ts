@@ -12,7 +12,7 @@ export class BoardPosition {
         return this.x + this.y * boardSize;
     }
     isOutsideBoard(board: Board): boolean {
-        return this.x < 0 || this.x > board.size || this.y < 0 || this.y > board.size;
+        return this.x < 0 || this.x >= board.size || this.y < 0 || this.y >= board.size;
     }
     saturatingAdd(v: BoardPositionAddable, board: Board): BoardPosition {
         let n = this.add(v);
