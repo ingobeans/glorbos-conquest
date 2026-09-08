@@ -166,8 +166,8 @@ export class Board {
     }
     canPlaceAt(placedCard: PlacedCard, position: BoardPosition): boolean {
         let tile = this.getTileAt(position);
-        if (tile.cards.length > 0) {
-            let last = <PlacedCard>tile.cards[tile.cards.length - 1];
+        let last = tile.tryGetLast();
+        if (last) {
             let canStack = last.card.canStack(last, placedCard);
             if (!canStack) {
                 return false;

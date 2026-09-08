@@ -42,6 +42,9 @@ export class MoveCardAction extends TargetedCardAction {
             if (newPos.isOutsideBoard(board)) {
                 continue;
             }
+            if (!board.canPlaceAt(card, newPos)) {
+                continue;
+            }
             tiles.push([newPos, "#fff"]);
         }
 
