@@ -127,3 +127,18 @@ body {
     top: 0;
     left: calc(var(--index) * 20%);
 }
+
+.highlight-tile {
+    --x: 0;
+    --y: 0;
+    --c: #000;
+    z-index: 2;
+    position: absolute;
+    left: calc(var(--x) * var(--tile-size));
+    top: calc(var(--y) * var(--tile-size));
+    width: var(--tile-size);
+    height: var(--tile-size);
+    outline: solid 1px white;
+    filter: drop-shadow(0 0 2px var(--c)) drop-shadow(0 0 2px var(--c));
+    pointer-events: none;
+}

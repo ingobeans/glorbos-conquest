@@ -15,7 +15,7 @@ export class CardAction {
      * Should return tiles that should be highlighted when this action is previewed.
      * Returns a list of tile indexes with the color for the highlight in hex.
     */
-    highlightsTiles(board: Board, card: PlacedCard, player: Player): [number, string][] {
+    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, string][] {
         return [];
     }
 
@@ -33,8 +33,8 @@ export class TargetedCardAction extends CardAction {
 
 export class MoveCardAction extends TargetedCardAction {
     name = "Move";
-    highlightsTiles(board: Board, card: PlacedCard, player: Player): [number, string][] {
-        let tiles: [number, string][] = [];
+    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, string][] {
+        let tiles: [BoardPosition, string][] = [];
         let directions: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
         let position = board.positionOf(card);
         for (let direction of directions) {
@@ -42,7 +42,7 @@ export class MoveCardAction extends TargetedCardAction {
             if (newPos.isOutsideBoard(board)) {
                 continue;
             }
-            tiles.push([board.positionToIndex(newPos), "#ff0000"]);
+            tiles.push([newPos, "#ff0000"]);
         }
 
         return tiles;

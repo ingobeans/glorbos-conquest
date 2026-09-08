@@ -8,6 +8,7 @@ import { PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
 
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
+let tilesHighlight = document.getElementById("tiles-highlight");
 
 export let activeClient: Client | undefined = undefined;
 
@@ -49,6 +50,29 @@ function handleReceivedPacket(packet: ServerPacket) {
         playerDeck?.style.setProperty("--count", activeClient.player.deck.length.toString());
     }
 }
+
+function highlightTiles(tiles: [BoardPosition, string][]) {
+    if (!tilesHighlight?.children)
+        throw Error;
+
+    for (let child of tilesHighlight?.children) {
+        child.remove();
+    }
+    for (let tile of tiles) {
+        let element = document.createElement("div");
+        element.className = "highlight-tile";
+        element.style.setProperty("--x", tile[0].x.toString());
+        element.style.setProperty("--y", tile[0].y.toString());
+        element.style.setProperty("--c", tile[1]);
+        tilesHighlight.appendChild(element);
+    }
+}
+let t: [BoardPosition, string][] = [];
+for (let c of [0, 1, 2, 3, 4]) {
+    t.push([new BoardPosition(c, 0), "#ff0000"]);
+    t.push([new BoardPosition(c, 2), "#ff0000"]);
+}
+highlightTiles(t);
 
 function createGridElements(size: number) {
     gameGrid?.style.setProperty("--size", size.toString());
