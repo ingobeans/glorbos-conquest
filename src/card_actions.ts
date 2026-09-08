@@ -1,5 +1,5 @@
 import { BoardPosition } from "./board";
-import { Board, Game, PlacedCard, Player } from "./engine";
+import { Board, Game, PlacedCard, Player, Tile } from "./engine";
 
 export enum TileHighlightColor {
     Blue,
@@ -25,7 +25,7 @@ export class CardAction {
     }
 
     /** Runs serverside when the action is used. To show effects for players, send them ServerActions */
-    use(game: Game, card: PlacedCard, player: Player) { }
+    use(game: Game, tile: Tile, card: PlacedCard, player: Player) { }
 }
 
 export class TargetedCardAction extends CardAction {
@@ -54,6 +54,11 @@ export class MoveCardAction extends TargetedCardAction {
         }
 
         return tiles;
+    }
+    use(game: Game, tile: Tile, card: PlacedCard, player: Player): void {
+        let taken = tile.takeLast();
+        let targetTile = game.board.getTileAt(this.target);
+        targetTile.cards.push(taken);
     }
 }
 

@@ -123,13 +123,22 @@ export class PlacedCard {
     }
 }
 
-class Tile {
+export class Tile {
     cards: PlacedCard[] = [];
-    tryGetLast(): PlacedCard | undefined {
+    tryTakeLast(): PlacedCard | undefined {
+        return this.cards.splice(this.cards.length - 1, 1)[0];
+    }
+    takeLast(): PlacedCard {
+        let l = this.tryTakeLast();
+        if (l == undefined)
+            throw Error("Tile.getLast() failed because tile has no cards");
+        return l;
+    }
+    tryBorrowLast(): PlacedCard | undefined {
         return this.cards[this.cards.length - 1];
     }
-    getLast(): PlacedCard {
-        let l = this.tryGetLast();
+    borrowLast(): PlacedCard {
+        let l = this.tryBorrowLast();
         if (l == undefined)
             throw Error("Tile.getLast() failed because tile has no cards");
         return l;
@@ -186,7 +195,7 @@ export class Board {
     }
     canPlaceAt(placedCard: PlacedCard, position: BoardPosition): boolean {
         let tile = this.getTileAt(position);
-        let last = tile.tryGetLast();
+        let last = tile.tryBorrowLast();
         if (last) {
             let canStack = last.card.canStack(last, placedCard);
             if (!canStack) {
@@ -239,10 +248,11 @@ export class Game {
     processPlayerPacket(packet: PlayerPacket) {
         let player = <Player>this.players[this.playerTurn];
         if (packet instanceof CardActionPlayerPacket) {
-            let placedCard = this.board.findCardOnBoard(packet.cardEntityId).placedCard;
+            let placedCardBoardDetails = this.board.findCardOnBoard(packet.cardEntityId);
+            let placedCard = placedCardBoardDetails.placedCard;
             let cardAction: CardAction = decodePacket(packet.cardActionPacket, cardActionsRegistry);
-            if (cardAction.available(this.board, placedCard, player)) {
-                cardAction.use(this, placedCard, player);
+            if (placedCardBoardDetails.topOfTile && cardAction.available(this.board, placedCard, player)) {
+                cardAction.use(this, placedCardBoardDetails.tile, placedCard, player);
             }
         }
         else if (packet instanceof PlaceCardPlayerPacket) {

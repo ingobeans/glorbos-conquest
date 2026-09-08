@@ -124,7 +124,7 @@ function clickTile(element: HTMLDivElement) {
         }
     }
 
-    let placedCard = activeClient.board.tiles[id]?.tryGetLast();
+    let placedCard = activeClient.board.tiles[id]?.tryBorrowLast();
     if (!placedCard) {
         stopSelectingTile();
         return;
