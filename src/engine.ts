@@ -164,7 +164,7 @@ export class Board {
         }
         return highlights;
     }
-    findCardOnBoard(card: Card | PlacedCard | number): { placedCard: PlacedCard, topOfTile: boolean, tile: Tile, position: BoardPosition } {
+    tryFindCardOnBoard(card: Card | PlacedCard | number): null | { placedCard: PlacedCard, topOfTile: boolean, tile: Tile, position: BoardPosition } {
         if (card instanceof PlacedCard) {
             card = card.card.entityId;
         } else if (card instanceof Card) {
@@ -182,7 +182,14 @@ export class Board {
                 }
             }
         }
-        throw Error("Card not found");
+        return null;
+    }
+    findCardOnBoard(card: Card | PlacedCard | number): { placedCard: PlacedCard, topOfTile: boolean, tile: Tile, position: BoardPosition } {
+        let result = this.tryFindCardOnBoard(card);
+        if (card == null) {
+            throw new Error("Card not found");
+        }
+        return <any>result;
     }
     positionOf(card: Card | PlacedCard | number): BoardPosition {
         return this.findCardOnBoard(card).position;
@@ -248,7 +255,11 @@ export class Game {
     processPlayerPacket(packet: PlayerPacket) {
         let player = <Player>this.players[this.playerTurn];
         if (packet instanceof CardActionPlayerPacket) {
-            let placedCardBoardDetails = this.board.findCardOnBoard(packet.cardEntityId);
+            let placedCardBoardDetails = this.board.tryFindCardOnBoard(packet.cardEntityId);
+            if (!placedCardBoardDetails) {
+                console.warn("Card not found on board");
+                return;
+            }
             let placedCard = placedCardBoardDetails.placedCard;
             let cardAction: CardAction = decodePacket(packet.cardActionPacket, cardActionsRegistry);
             if (placedCardBoardDetails.topOfTile && cardAction.available(this.board, placedCard, player)) {
