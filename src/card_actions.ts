@@ -1,5 +1,6 @@
 import { BoardPosition } from "./board";
 import { Board, Game, PlacedCard, Player, Tile } from "./engine";
+import { MoveCardServerPacket } from "./server_packets";
 
 export enum TileHighlightColor {
     Blue,
@@ -59,6 +60,7 @@ export class MoveCardAction extends TargetedCardAction {
         let taken = tile.takeLast();
         let targetTile = game.board.getTileAt(this.target);
         targetTile.cards.push(taken);
+        game.sendPackets([new MoveCardServerPacket(card.card.entityId, this.target)]);
     }
 }
 

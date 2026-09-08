@@ -1,4 +1,4 @@
-import { PlaceCardServerPacket, ServerPacket } from "../server_packets";
+import { MoveCardServerPacket, PlaceCardServerPacket, ServerPacket } from "../server_packets";
 import { BoardPosition } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
@@ -49,6 +49,16 @@ function handleReceivedPacket(packet: ServerPacket) {
         }
         element.id = "";
         playerDeck?.style.setProperty("--count", activeClient.player.deck.length.toString());
+    } else if (packet instanceof MoveCardServerPacket) {
+        let element = document.querySelector(`.placed-card[entityId='${packet.cardEntityId.toString()}']`);
+        let newTile = document.getElementById("tile" + activeClient.board.positionToIndex(packet.newPosition));
+        if (!element)
+            throw Error("Card not found");
+        newTile?.appendChild(element);
+    }
+
+    else {
+        console.warn("Unhandled packet");
     }
 }
 

@@ -17,9 +17,19 @@ export class PlaceCardServerPacket {
     }
 }
 
+export class MoveCardServerPacket {
+    cardEntityId: number;
+    newPosition: BoardPosition;
+    constructor(cardEntityId: number, newPosition: BoardPosition) {
+        this.cardEntityId = cardEntityId;
+        this.newPosition = newPosition;
+    }
+}
+
 export let serverPacketRegistry = [
     ErrorServerPacket.prototype,
     PlaceCardServerPacket.prototype,
+    MoveCardServerPacket.prototype
 ];
 
 // used to get the unioned type of server packets
