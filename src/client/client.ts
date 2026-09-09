@@ -18,9 +18,12 @@ export class Client {
             this.board.placeCardAt(new PlacedCard(this.player.takeCard(packet.card.entityId), this.player), packet.position);
         } else if (packet instanceof MoveCardServerPacket) {
             let c = this.board.findCardOnBoard(packet.cardEntityId);
+            let card = c.placedCard.card;
 
             if (!c.topOfTile)
                 throw Error("Moved Card not top of tile"); // assertion
+
+            card.roundData.hasMoved = (card.roundData.hasMoved || 0) + 1;
 
             let taken = c.tile.takeLast();
             this.board.getTileAt(packet.newPosition).cards.push(taken);

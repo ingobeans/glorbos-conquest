@@ -39,6 +39,9 @@ export class TargetedCardAction extends CardAction {
 
 export class MoveCardAction extends TargetedCardAction {
     name = "Move";
+    available(board: Board, card: PlacedCard, player: Player): boolean {
+        return !(card.card.roundData.hasMoved)
+    }
     highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
         let tiles: [BoardPosition, TileHighlightColor][] = [];
         let directions: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
@@ -60,6 +63,7 @@ export class MoveCardAction extends TargetedCardAction {
         let taken = tile.takeLast();
         let targetTile = game.board.getTileAt(this.target);
         targetTile.cards.push(taken);
+        card.card.roundData.hasMoved = (card.card.roundData.hasMoved || 0) + 1;
         game.sendPackets([new MoveCardServerPacket(card.card.entityId, this.target)]);
     }
 }
