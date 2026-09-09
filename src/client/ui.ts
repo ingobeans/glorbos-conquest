@@ -152,6 +152,10 @@ let selectedTile = {
     position: <BoardPosition | null>null,
 };
 function stopSelectingTile() {
+    let cardElement = document.querySelector(`.placed-card[entityId='${selectedTile.placedCard?.card.entityId.toString()}']`);
+    if (cardElement) {
+        cardElement.classList.remove("selected-placed-card");
+    }
     selectedTile.position = null;
     selectedTile.placedCard = null;
     highlightTiles([]);
@@ -196,6 +200,8 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     }
 
     let placedCard = activeClient.board.tiles[id]?.tryBorrowLast();
+
+
     if (!placedCard) {
         stopSelectingTile();
         return;
@@ -205,7 +211,13 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
         return;
     }
     selectedTile = { placedCard: placedCard, position: position };
+
     highlightTiles(activeClient.board.getHighlightedTiles(placedCard, activeClient.player));
+
+    let cardElement = document.querySelector(`.placed-card[entityId='${placedCard?.card.entityId.toString()}']`);
+    if (cardElement) {
+        cardElement.classList.add("selected-placed-card");
+    }
 }
 
 function updateHearts(cardEntityId: number) {

@@ -172,6 +172,11 @@ body {
     opacity: 0.7;
 }
 
+
+.selected-placed-card {
+    filter: drop-shadow(0 0 10px white);
+}
+
 .card-unavailable {
     filter: contrast(0.9) brightness(0.7);
 }
