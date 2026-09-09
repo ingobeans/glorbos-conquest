@@ -271,6 +271,10 @@ export class Game {
                 return;
             }
             let placedCard = placedCardBoardDetails.placedCard;
+            if (placedCard.ownerIndex != player.playerIndex) {
+                console.warn("Card not owned by the right player");
+                return;
+            }
             let cardAction: CardAction = decodePacket(packet.cardActionPacket, cardActionsRegistry);
             // check that the card actually has the specified action
 
