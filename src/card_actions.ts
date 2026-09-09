@@ -40,7 +40,13 @@ export class TargetedCardAction extends CardAction {
 export class MoveCardAction extends TargetedCardAction {
     name = "Move";
     available(board: Board, card: PlacedCard, player: Player): boolean {
-        return !(card.card.roundData.hasMoved)
+        if (card.card.roundData.hasMoved)
+            return false;
+        let highlightedTiles = this.highlightsTiles(board, card, player);
+        if (highlightedTiles.length == 0)
+            return false;
+
+        return true;
     }
     highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
         let tiles: [BoardPosition, TileHighlightColor][] = [];
