@@ -10,6 +10,7 @@ import { CardAction, TargetedCardAction, TileHighlightColor } from "../card_acti
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
 let tilesHighlight = document.getElementById("tiles-highlight");
+let placedCardsContainer = document.getElementById("placed-cards");
 
 export let activeClient: Client | undefined = undefined;
 
@@ -27,19 +28,17 @@ function handleReceivedPacket(packet: ServerPacket) {
     console.log(JSON.stringify(packet));
 
     if (packet instanceof PlaceCardServerPacket) {
-        let element = document.querySelector(`.held-card[entityId='${packet.card.entityId.toString()}']`);
+        let element = <HTMLDivElement | null>document.querySelector(`.held-card[entityId='${packet.card.entityId.toString()}']`);
         if (!element)
             throw Error("Card to be placed not found!");
 
-        let tile = document.getElementById("tile" + activeClient.board.positionToIndex(packet.position));
-        if (!tile)
-            throw Error("Tile not found");
 
-        (<any>element).onmouseover = undefined;
-        (<any>element).onmousedown = undefined;
+
+        element.onmouseover = null;
+        element.onmousedown = null;
         element.classList.remove("held-card");
         element.classList.add("placed-card");
-        tile.appendChild(element);
+        placedCardsContainer?.appendChild(element);
         let startIndex = parseInt(element.id.replace("held-card-", ""));
         for (let i = startIndex; i <= activeClient.player.deck.length; i++) {
             console.log(i);
@@ -48,14 +47,21 @@ function handleReceivedPacket(packet: ServerPacket) {
             e.style.setProperty("--index", (i - 1).toString());
         }
         element.id = "";
+        element.style = "";
+        element.style.setProperty("--x", packet.position.x.toString());
+        element.style.setProperty("--y", packet.position.y.toString());
         playerDeck?.style.setProperty("--count", activeClient.player.deck.length.toString());
         updateAvailableCards();
+
+        clickTile(packet.position);
     } else if (packet instanceof MoveCardServerPacket) {
-        let element = document.querySelector(`.placed-card[entityId='${packet.cardEntityId.toString()}']`);
-        let newTile = document.getElementById("tile" + activeClient.board.positionToIndex(packet.newPosition));
+        let element = <HTMLDivElement | null>document.querySelector(`.placed-card[entityId='${packet.cardEntityId.toString()}']`);
         if (!element)
             throw Error("Card not found");
-        newTile?.appendChild(element);
+
+        element.style.setProperty("--x", packet.newPosition.x.toString());
+        element.style.setProperty("--y", packet.newPosition.y.toString());
+        let newTile = document.getElementById("tile" + activeClient.board.positionToIndex(packet.newPosition));
         clickTile(<HTMLDivElement>newTile);
         updateAvailableCards();
     }
@@ -130,8 +136,11 @@ function createGridElements(board: Board) {
                 if (activeClient.player.playerIndex != card.ownerIndex) {
                     cardElement.classList.add("enemy-card");
                 }
+                let position = board.indexToPosition(i);
+                cardElement.style.setProperty("--x", position.x.toString());
+                cardElement.style.setProperty("--y", position.y.toString());
             }
-            element.appendChild(cardElement);
+            placedCardsContainer?.appendChild(cardElement);
         }
 
         gameGrid?.append(element);
@@ -274,7 +283,7 @@ function createPlayerHandElements(deck: Card[]) {
 }
 
 
-let zIndex = 0;
+let zIndex = 10;
 function mouseHoverCard(element: any) {
     zIndex++;
     element.style.zIndex = zIndex;

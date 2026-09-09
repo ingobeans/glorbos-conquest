@@ -1,6 +1,7 @@
 body {
     margin: 0;
     min-height: 100vh;
+    --tile-size: calc(min(10.7vh, 100px));
 }
 
 .dark-root {
@@ -25,7 +26,6 @@ body {
 #game-grid {
     --size: 5;
     --gap: 0px;
-    --tile-size: calc(min(10.7vh, 100px));
 
     --width: calc(var(--size) * (var(--tile-size) + var(--gap)));
     width: var(--width);
@@ -79,11 +79,17 @@ body {
 }
 
 .placed-card {
-    --width: 72%;
+    --width: calc(0.72 * var(--tile-size));
     position: absolute;
-    left: 50%;
-    top: 50%;
+    left: calc(var(--x) * var(--tile-size) + var(--tile-size) / 2.0);
+    top: calc(var(--y) * var(--tile-size) + var(--tile-size) / 2.0);
     transform: translate(-50%, -50%);
+    z-index: 4;
+    pointer-events: none;
+
+    transition: 0.3s;
+    transition-timing-function: ease-out;
+    transition-property: left, top;
 }
 
 #player-deck[style="--count: 1;"]>.held-card {
@@ -151,7 +157,7 @@ body {
     --x: 0;
     --y: 0;
     --c: 0deg;
-    z-index: 4;
+    z-index: 5;
     position: absolute;
     left: calc(var(--x) * var(--tile-size));
     top: calc(var(--y) * var(--tile-size));
