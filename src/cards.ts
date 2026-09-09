@@ -20,11 +20,23 @@ export class Card {
     entityId: number = -1;
     cardIndex: number = -1;
     actions: CardAction[] = [];
+    alive: boolean = true;
+    die() {
+        this.alive = false;
+    }
     canStack(self: PlacedCard, other: PlacedCard): boolean { return false; }
+    damage(amount: number): { died: boolean } {
+        this.health -= amount;
+        if (this.health <= 0.0) {
+            this.die();
+        }
+        return { died: !this.alive };
+    }
 }
 
 export let cardRegistry: Card[] = [];
 export function registerCard(card: Card) {
     card.cardIndex = cardRegistry.length;
+    card.health = card.maxHealth;
     cardRegistry.push(card);
 }

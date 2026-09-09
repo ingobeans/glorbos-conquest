@@ -1,6 +1,6 @@
 import { BoardPosition } from "./board";
 import { Board, Game, PlacedCard, Player, Tile } from "./engine";
-import { MoveCardServerPacket } from "./server_packets";
+import { DamageServerPacket, MoveCardServerPacket } from "./server_packets";
 
 export enum TileHighlightColor {
     Blue,
@@ -25,10 +25,6 @@ export class CardAction {
 
     /** Server- and clientside. */
     isResourcesAvailable(board: Board, card: PlacedCard, player: Player): boolean {
-        console.log(this.name);
-        console.log(this.desc);
-        console.log(this.usesResources);
-        console.log(this);
         for (let resource of this.usesResources) {
             if (card.card.roundData.resources[resource] <= 0) {
                 return false;
@@ -135,7 +131,20 @@ export class MeleeAttackCardAction extends TargetedCardAction {
     use(game: Game, tile: Tile, card: PlacedCard, player: Player): void {
         let targetTile = game.board.getTileAt(this.target);
         let victim = targetTile.borrowLast();
-        victim.card.health -= 1;
+
+        let packets = [];
+
+        if (victim.card.damage(1).died) {
+            // if victim dies from this attack,
+            // move attacker into its space
+
+            let taken = tile.takeLast();
+            let targetTile = game.board.getTileAt(this.target);
+            targetTile.cards.push(taken);
+            packets.push(new MoveCardServerPacket(card.card.entityId, this.target));
+        }
+        packets.push(new DamageServerPacket(card.card.entityId, victim.card.entityId, 1));
+        game.sendPackets(packets);
     }
 }
 

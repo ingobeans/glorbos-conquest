@@ -35,6 +35,17 @@ export class MoveCardServerPacket {
     }
 }
 
+export class DamageServerPacket {
+    attackerEntityId: number;
+    victimEntityId: number;
+    amount: number;
+    constructor(attackerEntityId: number, victimEntityId: number, amount: number) {
+        this.attackerEntityId = attackerEntityId;
+        this.victimEntityId = victimEntityId;
+        this.amount = amount;
+    }
+}
+
 /** List of all serverPackets. 
  * Every packet class must be listed here to be valid.
  * 
@@ -47,6 +58,7 @@ export let serverPacketRegistry = [
     PlaceCardServerPacket.prototype,
     MoveCardServerPacket.prototype,
     UpdateCardRoundDataServerPacket.prototype,
+    DamageServerPacket.prototype,
 ];
 
 // used to get the unioned type of server packets

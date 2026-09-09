@@ -1,4 +1,4 @@
-import { MoveCardServerPacket, PlaceCardServerPacket, ServerPacket, UpdateCardRoundDataServerPacket } from "../server_packets";
+import { DamageServerPacket, MoveCardServerPacket, PlaceCardServerPacket, ServerPacket, UpdateCardRoundDataServerPacket } from "../server_packets";
 import { Board, PlacedCard, Player } from "../engine";
 import { PlayerPacket } from "../player_packets";
 
@@ -27,6 +27,9 @@ export class Client {
         } else if (packet instanceof UpdateCardRoundDataServerPacket) {
             let c = this.board.findCardOnBoard(packet.cardEntityId);
             c.placedCard.card.roundData = packet.roundData;
+        } else if (packet instanceof DamageServerPacket) {
+            let victim = this.board.findCardOnBoard(packet.victimEntityId);
+            victim.placedCard.card.damage(packet.amount);
         } else {
             console.warn("Unhandled packet: ");
             console.warn(packet);
