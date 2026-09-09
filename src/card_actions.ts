@@ -104,6 +104,41 @@ export class MoveCardAction extends TargetedCardAction {
     }
 }
 
+export class MeleeAttackCardAction extends TargetedCardAction {
+    name = "Melee Attack";
+    usesResources = [CardActionResource.Attack];
+    availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
+        let highlightedTiles = this.highlightsTiles(board, card, player);
+        if (highlightedTiles.length == 0)
+            return false;
+
+        return true;
+    }
+    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
+        let tiles: [BoardPosition, TileHighlightColor][] = [];
+        let directions: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
+        let position = board.positionOf(card);
+        for (let direction of directions) {
+            let newPos = position.add(direction);
+            if (newPos.isOutsideBoard(board)) {
+                continue;
+            }
+            let card = board.getTileAt(newPos).tryBorrowLast();
+            if (card && card.ownerIndex != player.playerIndex) {
+                tiles.push([newPos, TileHighlightColor.Red]);
+            }
+
+        }
+
+        return tiles;
+    }
+    use(game: Game, tile: Tile, card: PlacedCard, player: Player): void {
+        let targetTile = game.board.getTileAt(this.target);
+        let victim = targetTile.borrowLast();
+        victim.card.health -= 1;
+    }
+}
+
 
 /** List of all cardActions. 
  * Every card action class must be listed here to be valid.
@@ -113,6 +148,7 @@ export class MoveCardAction extends TargetedCardAction {
  * then A should be listed earlier than B.
 */
 export let cardActionsRegistry = [
-    MoveCardAction.prototype
+    MoveCardAction.prototype,
+    MeleeAttackCardAction.prototype
 ];
 console.log(cardActionsRegistry);
