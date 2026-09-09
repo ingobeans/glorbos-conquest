@@ -1,4 +1,4 @@
-import { MoveCardServerPacket, PlaceCardServerPacket, ServerPacket, UpdateCardRoundDataServerPacket } from "../server_packets";
+import { DamageServerPacket, MoveCardServerPacket, PlaceCardServerPacket, ServerPacket, UpdateCardRoundDataServerPacket } from "../server_packets";
 import { BoardPosition } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
@@ -65,6 +65,9 @@ function handleReceivedPacket(packet: ServerPacket) {
             clickTile(selectedTile.position);
         }
     }
+    else if (packet instanceof DamageServerPacket) {
+        updateHearts(packet.victimEntityId);
+    }
     else {
         console.warn("Unhandled packet");
     }
@@ -75,13 +78,17 @@ let highlightColorToHueRotate = {
     [TileHighlightColor.Red]: 190,
 }
 
+function removeChildren(element: HTMLElement) {
+    while (element.children[0]) {
+        element.children[0].remove();
+    }
+}
+
 function highlightTiles(tiles: [BoardPosition, TileHighlightColor][]) {
     if (!tilesHighlight?.children)
         throw Error();
 
-    while (tilesHighlight.children[0]) {
-        tilesHighlight.children[0].remove();
-    }
+    removeChildren(tilesHighlight);
     for (let tile of tiles) {
         let element = document.createElement("div");
         element.className = "highlight-tile";
@@ -192,6 +199,40 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     highlightTiles(activeClient.board.getHighlightedTiles(placedCard, activeClient.player));
 }
 
+function updateHearts(cardEntityId: number) {
+    if (!activeClient)
+        return;
+    let element = document.querySelector(`.placed-card[entityId='${cardEntityId.toString()}']`);
+    let container = <HTMLElement>element?.getElementsByClassName("hearts-container")[0];
+
+    removeChildren(container);
+    addHearts(container, activeClient.board.findCardOnBoard(cardEntityId).placedCard.card);
+}
+
+function addHearts(parent: HTMLElement, card: Card) {
+    for (let i = 0; i < card.maxHealth / 2; i++) {
+        let image = document.createElement("img");
+        image.classList.add("card-heart");
+        let heartType = "heart_full";
+        if (i != card.maxHealth / 2 && i == Math.floor(card.maxHealth / 2)) {
+            heartType = "heart_half";
+        }
+        if (card.health / 2 <= i) {
+            heartType += "_missing";
+        } else if (Math.floor(card.health / 2) <= i && heartType != "heart_half") {
+            heartType += "_missing_half";
+        }
+        else {
+            heartType += "_present";
+        }
+        if (heartType == "heart_half_missing_half") {
+            heartType = "heart_half_missing";
+        }
+        image.src = `assets/graphics/${heartType}.png`;
+        parent.appendChild(image);
+    }
+}
+
 function createCardElement(card: Card): HTMLDivElement {
     let element = document.createElement("div");
     element.setAttribute("entityId", card.entityId.toString());
@@ -202,15 +243,10 @@ function createCardElement(card: Card): HTMLDivElement {
     image.src = "assets/cards/" + <string>card.image + ".png";
     element.appendChild(image);
 
-    for (let i = 0; i < card.maxHealth / 2; i++) {
-        let image = document.createElement("img");
-        image.classList.add("card-heart");
-        image.src = "assets/graphics/heart.png";
-        if (i != card.maxHealth / 2 && i == Math.floor(card.maxHealth / 2)) {
-            image.src = "assets/graphics/heart_half_full.png";
-        }
-        element.appendChild(image);
-    }
+    let heartsContainer = document.createElement("div");
+    heartsContainer.className = "hearts-container";
+    addHearts(heartsContainer, card);
+    element.appendChild(heartsContainer);
 
     for (const [index, type] of card.elementTypes.entries()) {
         let image = document.createElement("img");
