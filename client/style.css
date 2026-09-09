@@ -162,3 +162,7 @@ body {
     background-size: cover;
     filter: hue-rotate(var(--c));
 }
+
+.card-unavailable {
+    filter: contrast(0.9) brightness(0.7);
+}

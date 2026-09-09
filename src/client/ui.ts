@@ -49,6 +49,7 @@ function handleReceivedPacket(packet: ServerPacket) {
         }
         element.id = "";
         playerDeck?.style.setProperty("--count", activeClient.player.deck.length.toString());
+        updateAvailableCards();
     } else if (packet instanceof MoveCardServerPacket) {
         let element = document.querySelector(`.placed-card[entityId='${packet.cardEntityId.toString()}']`);
         let newTile = document.getElementById("tile" + activeClient.board.positionToIndex(packet.newPosition));
@@ -56,6 +57,7 @@ function handleReceivedPacket(packet: ServerPacket) {
             throw Error("Card not found");
         newTile?.appendChild(element);
         clickTile(<HTMLDivElement>newTile);
+        updateAvailableCards();
     }
 
     else {
@@ -82,6 +84,23 @@ function highlightTiles(tiles: [BoardPosition, TileHighlightColor][]) {
         element.style.setProperty("--y", tile[0].y.toString());
         element.style.setProperty("--c", highlightColorToHueRotate[tile[1]].toString() + "deg");
         tilesHighlight.appendChild(element);
+    }
+}
+
+function updateAvailableCards() {
+    if (!activeClient)
+        return
+
+    for (let tile of activeClient.board.tiles) {
+        let placedCard = tile.tryBorrowLast();
+        if (!placedCard)
+            continue
+        let element = document.querySelector(`.placed-card[entityId='${placedCard.card.entityId.toString()}']`);
+        if (!activeClient.board.anyActionAvailable(placedCard, activeClient.player)) {
+            element?.classList.add("card-unavailable");
+        } else {
+            element?.classList.remove("card-unavailable");
+        }
     }
 }
 

@@ -154,6 +154,14 @@ export class Board {
             this.tiles.push(new Tile());
         }
     }
+    anyActionAvailable(placedCard: PlacedCard, player: Player): boolean {
+        for (let action of placedCard.card.actions) {
+            if (action.available(this, placedCard, player)) {
+                return true;
+            }
+        }
+        return false;
+    }
     getHighlightedTiles(placedCard: PlacedCard, player: Player) {
         let highlights: [BoardPosition, TileHighlightColor][] = [];
         for (let action of placedCard.card.actions) {
