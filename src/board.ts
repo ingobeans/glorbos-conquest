@@ -33,6 +33,10 @@ export class BoardPosition {
         let n = new BoardPosition(this.x - parsed.x, this.y - parsed.y);
         return n;
     }
+    normalize(): BoardPosition {
+        let length = this.length();
+        return new BoardPosition(this.x / length, this.y / length);
+    }
     length(): number {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }

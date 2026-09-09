@@ -73,6 +73,20 @@ function handleReceivedPacket(packet: ServerPacket) {
     }
     else if (packet instanceof DamageServerPacket) {
         updateHearts(packet.victimEntityId);
+        let element = <HTMLDivElement | null>document.querySelector(`.placed-card[entityId='${packet.attackerEntityId.toString()}']`);
+        if (!element)
+            throw Error("Card not found");
+        let attacker = activeClient.board.findCardOnBoard(packet.attackerEntityId).position;
+        let victim = activeClient.board.findCardOnBoard(packet.victimEntityId).position;
+        let delta = victim.subtract(attacker).normalize();
+        element.style.setProperty("--offset-x", (delta.x * 30).toString() + "px");
+        element.style.setProperty("--offset-y", (delta.y * 30).toString() + "px");
+        element.style.setProperty("transition", "0.1s");
+        setTimeout(() => {
+            element.style.setProperty("--offset-x", null);
+            element.style.setProperty("--offset-y", null);
+            element.style.setProperty("transition", null);
+        }, 120)
     }
     else {
         console.warn("Unhandled packet");
