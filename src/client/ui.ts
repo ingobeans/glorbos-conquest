@@ -319,6 +319,18 @@ document.addEventListener("mousemove", (event) => {
     }
 });
 
+declare let dark: boolean;
+let darkmodeButton = <HTMLButtonElement>document.getElementById("darkmode-switch");
+darkmodeButton.addEventListener("click", (event) => {
+    dark = !dark;
+    localStorage.setItem("dark", dark.toString());
+    if (dark) {
+        document.documentElement.classList.add('dark-root')
+    } else {
+        document.documentElement.classList.remove('dark-root')
+    }
+})
+
 export function loadUi(client: Client): (packet: ServerPacket) => void {
     activeClient = client;
     createGridElements(client.board.size);

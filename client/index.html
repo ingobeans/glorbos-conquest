@@ -5,9 +5,17 @@
     <meta charset="UTF-8" />
     <title>glorbo's conquest</title>
     <link href="style.css" rel="stylesheet">
+
+    <script>
+        dark = localStorage.getItem("dark") == "true";
+        if (dark) {
+            document.documentElement.classList.add('dark-root')
+        }
+    </script>
 </head>
 
 <body>
+    <button id="darkmode-switch">X</button>
     <script src="client.js" defer></script>
     <div id="game-grid" class="no-drag">
         <div id="tiles-highlight"></div>

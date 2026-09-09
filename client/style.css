@@ -1,7 +1,20 @@
 body {
     margin: 0;
     min-height: 100vh;
+}
+
+.dark-root {
     background-color: #0e0e0e;
+}
+
+#darkmode-switch {
+    border-radius: 0;
+    border: solid 1px black;
+    background-color: white;
+}
+
+#darkmode-switch:hover {
+    filter: brightness(0.8);
 }
 
 #game-grid {
