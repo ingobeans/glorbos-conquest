@@ -33,25 +33,35 @@ export class EncodedPacket<Type> {
     }
 }
 
-export function createEncodedPacket<Type extends Object>(data: Type, registry: any[]): EncodedPacket<Type> {
+export class PacketEncodeOptions {
+    skipKeys: string[];
+    constructor(skipKeys: string[]) {
+        this.skipKeys = skipKeys;
+    }
+}
+
+export const defaultPacketEncodeOptions = new PacketEncodeOptions([]);
+export const cardActionEncodeOptions = new PacketEncodeOptions(["desc"]);
+
+export function createEncodedPacket<Type extends Object>(data: Type, registry: any[], encodeOptions: PacketEncodeOptions = defaultPacketEncodeOptions): EncodedPacket<Type> {
     let index = -1;
     for (let [i, ty] of registry.entries()) {
         if (data instanceof ty.constructor) {
             index = i;
+        }
+    }
+    if (encodeOptions.skipKeys.length > 0) {
+        data = clone(data);
+        for (let key of encodeOptions.skipKeys) {
+            (<any>data)[key] = undefined;
         }
     }
     let packet = new EncodedPacket(index, data);
     return packet;
 }
 
-export function encodePacket(data: Object, registry: any[]): string {
-    let index = -1;
-    for (let [i, ty] of registry.entries()) {
-        if (data instanceof ty.constructor) {
-            index = i;
-        }
-    }
-    let packet = new EncodedPacket(index, data);
+export function encodePacket(data: Object, registry: any[], encodeOptions: PacketEncodeOptions = defaultPacketEncodeOptions): string {
+    let packet = createEncodedPacket(data, registry, encodeOptions);
     let packetEncoded = JSON.stringify(packet);
     return packetEncoded;
 }

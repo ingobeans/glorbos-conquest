@@ -15,6 +15,7 @@ function sendPlayerPacket(packet: PlayerPacket) {
     // for the sake of ensuring parity.
 
     let packetEncoded = encodePacket(packet, playerPacketsRegistry);
+    console.log(packetEncoded);
     let packetDecoded = decodePacket(packetEncoded, playerPacketsRegistry);
 
     game.processPlayerPacket(packetDecoded);

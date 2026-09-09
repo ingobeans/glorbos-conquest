@@ -10,6 +10,7 @@ export enum TileHighlightColor {
 export class CardAction {
     name: string = "unknown";
     icon: string = "placeholder";
+    desc: string = "unknown";
 
     /** Runs server- and clientside. */
     available(board: Board, card: PlacedCard, player: Player): boolean {
