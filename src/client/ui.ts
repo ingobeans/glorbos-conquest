@@ -1,4 +1,4 @@
-import { MoveCardServerPacket, PlaceCardServerPacket, ServerPacket } from "../server_packets";
+import { MoveCardServerPacket, PlaceCardServerPacket, ServerPacket, UpdateCardRoundDataServerPacket } from "../server_packets";
 import { BoardPosition } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
@@ -59,7 +59,12 @@ function handleReceivedPacket(packet: ServerPacket) {
         clickTile(<HTMLDivElement>newTile);
         updateAvailableCards();
     }
-
+    else if (packet instanceof UpdateCardRoundDataServerPacket) {
+        updateAvailableCards();
+        if (selectedTile.position) {
+            clickTile(selectedTile.position);
+        }
+    }
     else {
         console.warn("Unhandled packet");
     }
@@ -141,7 +146,8 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     if (selectedTile.placedCard) {
         let pressedAction: CardAction | null = null;
         for (let action of selectedTile.placedCard.card.actions) {
-            if (action.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
+            let actionInstance = new (<any>action).constructor();
+            if (actionInstance.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
                 let tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
                 for (let tile of tiles) {
                     if (tile[0].equals(position)) {

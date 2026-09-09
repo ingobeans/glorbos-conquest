@@ -6,6 +6,7 @@ import { PlacedCard } from "../engine";
 class Knight extends Card {
     name = "Knight";
     image = "knight";
+    desc = "A mighty knight who fights for the light."
     elementTypes = [ElementType.Light];
     maxHealth = 6;
     actions = [

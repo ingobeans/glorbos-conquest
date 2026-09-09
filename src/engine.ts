@@ -1,7 +1,7 @@
 import { populate } from "./registry";
 import { Card, cardRegistry, CardRoundData } from "./cards"
 import { SpellCard, spellCardRegistry } from "./spellcards"
-import { PlaceCardServerPacket, ErrorServerPacket, ServerPacket, } from "./server_packets";
+import { PlaceCardServerPacket, ErrorServerPacket, ServerPacket, UpdateCardRoundDataServerPacket, } from "./server_packets";
 import { BoardPosition } from "./board";
 import { clone, decodePacket } from "./utils";
 import { CardAction, cardActionsRegistry, TileHighlightColor } from "./card_actions";
@@ -156,7 +156,8 @@ export class Board {
     }
     anyActionAvailable(placedCard: PlacedCard, player: Player): boolean {
         for (let action of placedCard.card.actions) {
-            if (action.available(this, placedCard, player)) {
+            let actionInstance = new (<any>action).constructor();
+            if (actionInstance.available(this, placedCard, player)) {
                 return true;
             }
         }
@@ -165,7 +166,8 @@ export class Board {
     getHighlightedTiles(placedCard: PlacedCard, player: Player) {
         let highlights: [BoardPosition, TileHighlightColor][] = [];
         for (let action of placedCard.card.actions) {
-            if (action.available(this, placedCard, player)) {
+            let actionInstance = new (<any>action).constructor();
+            if (actionInstance.available(this, placedCard, player)) {
                 let tiles = action.highlightsTiles(this, placedCard, player);
                 highlights = highlights.concat(tiles);
             }
@@ -272,6 +274,10 @@ export class Game {
             let cardAction: CardAction = decodePacket(packet.cardActionPacket, cardActionsRegistry);
             if (placedCardBoardDetails.topOfTile && cardAction.available(this.board, placedCard, player)) {
                 cardAction.use(this, placedCardBoardDetails.tile, placedCard, player);
+                if (cardAction.usesResources.length > 0) {
+                    cardAction.useResources(this, placedCardBoardDetails.tile, placedCard, player);
+                    this.sendPackets([new UpdateCardRoundDataServerPacket(placedCard.card.entityId, placedCard.card.roundData)]);
+                }
             }
         }
         else if (packet instanceof PlaceCardPlayerPacket) {

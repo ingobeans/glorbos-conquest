@@ -1,5 +1,5 @@
 import { BoardPosition } from "./board";
-import { Card } from "./cards";
+import { Card, CardRoundData } from "./cards";
 
 export class ErrorServerPacket {
     text: string;
@@ -14,6 +14,15 @@ export class PlaceCardServerPacket {
     constructor(card: Card, position: BoardPosition) {
         this.card = card;
         this.position = position;
+    }
+}
+
+export class UpdateCardRoundDataServerPacket {
+    cardEntityId: number;
+    roundData: CardRoundData;
+    constructor(cardEntityId: number, resources: CardRoundData) {
+        this.cardEntityId = cardEntityId;
+        this.roundData = resources;
     }
 }
 
@@ -36,7 +45,8 @@ export class MoveCardServerPacket {
 export let serverPacketRegistry = [
     ErrorServerPacket.prototype,
     PlaceCardServerPacket.prototype,
-    MoveCardServerPacket.prototype
+    MoveCardServerPacket.prototype,
+    UpdateCardRoundDataServerPacket.prototype,
 ];
 
 // used to get the unioned type of server packets

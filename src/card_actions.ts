@@ -7,13 +7,38 @@ export enum TileHighlightColor {
     Red,
 }
 
+export enum CardActionResource {
+    Movement,
+    Attack,
+}
+
 export class CardAction {
     name: string = "unknown";
     icon: string = "placeholder";
     desc: string = "unknown";
+    usesResources: CardActionResource[] = [];
 
-    /** Runs server- and clientside. */
+    /** Server- and clientside. */
     available(board: Board, card: PlacedCard, player: Player): boolean {
+        return this.isResourcesAvailable(board, card, player) && this.availableCustom(board, card, player);
+    }
+
+    /** Server- and clientside. */
+    isResourcesAvailable(board: Board, card: PlacedCard, player: Player): boolean {
+        console.log(this.name);
+        console.log(this.desc);
+        console.log(this.usesResources);
+        console.log(this);
+        for (let resource of this.usesResources) {
+            if (card.card.roundData.resources[resource] <= 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Server- and clientside. */
+    availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
         return true;
     }
 
@@ -24,6 +49,12 @@ export class CardAction {
     */
     highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
         return [];
+    }
+
+    useResources(game: Game, tile: Tile, card: PlacedCard, player: Player) {
+        for (let resource of this.usesResources) {
+            card.card.roundData.resources[resource]--;
+        }
     }
 
     /** Runs serverside when the action is used. To show effects for players, send them ServerActions */
@@ -40,9 +71,8 @@ export class TargetedCardAction extends CardAction {
 
 export class MoveCardAction extends TargetedCardAction {
     name = "Move";
-    available(board: Board, card: PlacedCard, player: Player): boolean {
-        if (card.card.roundData.hasMoved)
-            return false;
+    usesResources = [CardActionResource.Movement];
+    availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
         let highlightedTiles = this.highlightsTiles(board, card, player);
         if (highlightedTiles.length == 0)
             return false;
@@ -70,7 +100,6 @@ export class MoveCardAction extends TargetedCardAction {
         let taken = tile.takeLast();
         let targetTile = game.board.getTileAt(this.target);
         targetTile.cards.push(taken);
-        card.card.roundData.hasMoved = (card.card.roundData.hasMoved || 0) + 1;
         game.sendPackets([new MoveCardServerPacket(card.card.entityId, this.target)]);
     }
 }

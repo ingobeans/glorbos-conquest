@@ -1,11 +1,13 @@
-import { CardAction } from "./card_actions";
+import { CardAction, CardActionResource } from "./card_actions";
 import { ElementType } from "./elements";
 import { PlacedCard } from "./engine";
 
 /** Data stored for cards that reset for each round. */
 export class CardRoundData {
-    hasMoved: undefined | number = undefined;
-
+    resources: { [key in CardActionResource]: number } = {
+        [CardActionResource.Attack]: 1,
+        [CardActionResource.Movement]: 1,
+    }
 }
 
 export class Card {
