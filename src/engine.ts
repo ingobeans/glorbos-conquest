@@ -276,7 +276,9 @@ export class Game {
 
             let found = false;
             for (let action of placedCard.card.actions) {
-                if (action.name == cardAction.name) {
+                let actionInstance = new (<any>action).constructor();
+
+                if (actionInstance.name == cardAction.name) {
                     found = true;
                 }
             }
