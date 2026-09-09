@@ -2,7 +2,7 @@ import { MoveCardServerPacket, PlaceCardServerPacket, ServerPacket, UpdateCardRo
 import { BoardPosition } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
-import { Game, PlacedCard } from "../engine";
+import { Board, Game, PlacedCard } from "../engine";
 import { Client } from "./client";
 import { CardActionPlayerPacket, PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
 import { CardAction, TargetedCardAction, TileHighlightColor } from "../card_actions";
@@ -101,7 +101,7 @@ function updateAvailableCards() {
         if (!placedCard)
             continue
         let element = document.querySelector(`.placed-card[entityId='${placedCard.card.entityId.toString()}']`);
-        if (!activeClient.board.anyActionAvailable(placedCard, activeClient.player)) {
+        if (placedCard.ownerIndex == activeClient.player.playerIndex && !activeClient.board.anyActionAvailable(placedCard, activeClient.player)) {
             element?.classList.add("card-unavailable");
         } else {
             element?.classList.remove("card-unavailable");
@@ -109,13 +109,24 @@ function updateAvailableCards() {
     }
 }
 
-function createGridElements(size: number) {
-    gameGrid?.style.setProperty("--size", size.toString());
-    for (let i = 0; i < size * size; i++) {
+function createGridElements(board: Board) {
+    gameGrid?.style.setProperty("--size", board.size.toString());
+    for (let [i, tile] of board.tiles.entries()) {
         let element = document.createElement("div");
         element.classList.add("tile");
         element.id = "tile" + i;
         element.onclick = clickTile.bind(null, element);
+        for (let card of tile.cards) {
+            let cardElement = createCardElement(card.card);
+            cardElement.classList.add("placed-card");
+            if (activeClient) {
+                if (activeClient.player.playerIndex != card.ownerIndex) {
+                    cardElement.classList.add("enemy-card");
+                }
+            }
+            element.appendChild(cardElement);
+        }
+
         gameGrid?.append(element);
     }
 }
@@ -181,40 +192,45 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     highlightTiles(activeClient.board.getHighlightedTiles(placedCard, activeClient.player));
 }
 
+function createCardElement(card: Card): HTMLDivElement {
+    let element = document.createElement("div");
+    element.setAttribute("entityId", card.entityId.toString());
+    element.classList.add("card");
+
+    let image = document.createElement("img");
+    image.classList.add("card-img");
+    image.src = "assets/cards/" + <string>card.image + ".png";
+    element.appendChild(image);
+
+    for (let i = 0; i < card.maxHealth / 2; i++) {
+        let image = document.createElement("img");
+        image.classList.add("card-heart");
+        image.src = "assets/graphics/heart.png";
+        if (i != card.maxHealth / 2 && i == Math.floor(card.maxHealth / 2)) {
+            image.src = "assets/graphics/heart_half_full.png";
+        }
+        element.appendChild(image);
+    }
+
+    for (const [index, type] of card.elementTypes.entries()) {
+        let image = document.createElement("img");
+        image.classList.add("card-type");
+        image.src = "assets/elements/" + ElementType[type].toLowerCase() + ".png";
+        image.style.setProperty("--index", index.toString());
+        element.appendChild(image);
+    }
+    return element
+}
+
 function createPlayerHandElements(deck: Card[]) {
     for (let i = 0; i < deck.length; i++) {
         let item = <Card>deck[i];
-        let element = document.createElement("div");
-        element.setAttribute("entityId", item.entityId.toString());
-        element.classList.add("held-card");
-        element.classList.add("card");
+        let element = createCardElement(item);
         element.id = "held-card-" + i.toString();
         element.style.setProperty("--index", i.toString());
+        element.classList.add("held-card");
         element.onmouseover = mouseHoverCard.bind(null, element);
         element.onmousedown = cardMouseDown.bind(null, element);
-
-        let image = document.createElement("img");
-        image.classList.add("card-img");
-        image.src = "assets/cards/" + <string>item.image + ".png";
-        element.appendChild(image);
-
-        for (let i = 0; i < item.maxHealth / 2; i++) {
-            let image = document.createElement("img");
-            image.classList.add("card-heart");
-            image.src = "assets/graphics/heart.png";
-            if (i != item.maxHealth / 2 && i == Math.floor(item.maxHealth / 2)) {
-                image.src = "assets/graphics/heart_half_full.png";
-            }
-            element.appendChild(image);
-        }
-
-        for (const [index, type] of item.elementTypes.entries()) {
-            let image = document.createElement("img");
-            image.classList.add("card-type");
-            image.src = "assets/elements/" + ElementType[type].toLowerCase() + ".png";
-            image.style.setProperty("--index", index.toString());
-            element.appendChild(image);
-        }
 
         playerDeck?.append(element);
     }
@@ -358,7 +374,7 @@ darkmodeButton.addEventListener("click", (event) => {
 
 export function loadUi(client: Client): (packet: ServerPacket) => void {
     activeClient = client;
-    createGridElements(client.board.size);
+    createGridElements(client.board);
     createPlayerHandElements(client.player.deck);
     return handleReceivedPacket;
 }

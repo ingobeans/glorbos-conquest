@@ -166,3 +166,8 @@ body {
 .card-unavailable {
     filter: contrast(0.9) brightness(0.7);
 }
+
+.enemy-card {
+    border: solid 2px #af0000;
+    background-color: #ffece1;
+}

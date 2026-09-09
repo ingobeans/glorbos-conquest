@@ -1,5 +1,5 @@
 import { Card, cardRegistry } from "../cards";
-import { Game, Player } from "../engine";
+import { Game, PlacedCard, Player } from "../engine";
 import { PlayerPacket, playerPacketsRegistry } from "../player_packets";
 import { ServerPacket, serverPacketRegistry } from "../server_packets";
 import { clone, decodePacket, encodePacket } from "../utils";
@@ -38,6 +38,10 @@ function sendServerPacket(packets: ServerPacket[], playerIndex: number) {
 }
 
 game = new Game(5, sendServerPacket);
+let card = <Card>game.players[1]?.deck[1];
+game.players[1]?.removeCard(card.entityId);
+game.board.tiles[7]?.cards.push(new PlacedCard(card, 1));
+
 client = new Client(clone(game.board), clone(<Player>game.players[0]), sendPlayerPacket);
 
 console.log(cardRegistry);
