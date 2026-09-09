@@ -29,6 +29,13 @@ export class CardActionPlayerPacket<Type extends CardAction> {
     }
 }
 
+/** List of all playerPackets. 
+ * Every packet class must be listed here to be valid.
+ * 
+ * When it comes to inheritance, parent classes should be further up,
+ * and child classes should be further down. If B inherits from A, 
+ * then A should be listed earlier than B.
+*/
 export let playerPacketsRegistry = [
     StatePlayerPacket.prototype,
     PlaceCardPlayerPacket.prototype,
