@@ -1,5 +1,5 @@
 import { populate } from "./registry";
-import { Card, cardRegistry } from "./cards"
+import { Card, cardRegistry, CardRoundData } from "./cards"
 import { SpellCard, spellCardRegistry } from "./spellcards"
 import { PlaceCardServerPacket, ErrorServerPacket, ServerPacket, } from "./server_packets";
 import { BoardPosition } from "./board";
@@ -290,6 +290,9 @@ export class Game {
             switch (packet.type) {
                 case StatePlayerPacketType.EndTurn:
                     this.playerTurn = (this.playerTurn + 1) % this.players.length;
+                    for (let card of player.deck) {
+                        card.roundData = new CardRoundData();
+                    }
                     break;
             }
         } else {
