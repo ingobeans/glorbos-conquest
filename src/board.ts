@@ -33,8 +33,12 @@ export class BoardPosition {
         let n = new BoardPosition(this.x - parsed.x, this.y - parsed.y);
         return n;
     }
+    /** Returns zero if length is zero */
     normalize(): BoardPosition {
         let length = this.length();
+        if (length == 0.0) {
+            return new BoardPosition(0.0, 0.0);
+        }
         return new BoardPosition(this.x / length, this.y / length);
     }
     length(): number {
