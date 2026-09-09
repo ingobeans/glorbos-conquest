@@ -1,3 +1,4 @@
+import { MoveCardAction } from "../card_actions";
 import { Card, cardRegistry } from "../cards";
 import { Game, PlacedCard, Player } from "../engine";
 import { PlayerPacket, playerPacketsRegistry } from "../player_packets";
@@ -43,6 +44,7 @@ game.players[1]?.removeCard(card.entityId);
 game.board.tiles[7]?.cards.push(new PlacedCard(card, 1));
 
 client = new Client(clone(game.board), clone(<Player>game.players[0]), sendPlayerPacket);
+// client.player.deck[0]?.actions.push(MoveCardAction.prototype);
 
 console.log(cardRegistry);
 

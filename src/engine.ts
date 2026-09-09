@@ -272,6 +272,19 @@ export class Game {
             }
             let placedCard = placedCardBoardDetails.placedCard;
             let cardAction: CardAction = decodePacket(packet.cardActionPacket, cardActionsRegistry);
+            // check that the card actually has the specified action
+
+            let found = false;
+            for (let action of placedCard.card.actions) {
+                if (action.name == cardAction.name) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                console.warn("Action not found for card");
+                return;
+            }
+
             if (placedCardBoardDetails.topOfTile && cardAction.available(this.board, placedCard, player)) {
                 cardAction.use(this, placedCardBoardDetails.tile, placedCard, player);
                 if (cardAction.usesResources.length > 0) {
