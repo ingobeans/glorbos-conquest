@@ -111,9 +111,11 @@ body {
     --rotate: calc(asin(var(--circle-x)));
     rotate: var(--rotate);
     top: calc(cos(asin(var(--circle-x) * 2)) * -3 * var(--width) + 1.5 * var(--width));
-    transition: 0.1s;
     transform: translate(calc(var(--x) / var(--scale)), calc(var(--y) / var(--scale)));
     scale: var(--scale);
+
+    transition: 0.1s;
+    transition-property: transform, left, top, scale, rotate !important;
 }
 
 .held-card:hover,
