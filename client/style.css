@@ -161,6 +161,7 @@ body {
     background-image: url("assets/target.png");
     background-size: cover;
     filter: hue-rotate(var(--c));
+    opacity: 0.7;
 }
 
 .card-unavailable {
