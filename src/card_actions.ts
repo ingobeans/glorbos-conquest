@@ -18,7 +18,20 @@ export class CardAction {
     desc: string = "unknown";
     usesResources: CardActionResource[] = [];
 
-    /** Server- and clientside. */
+    /**  
+     * Serverside. 
+     * Validates a received action is allowed.
+     * Always used on a fully constructed instance.
+    */
+    valid(board: Board, card: PlacedCard, player: Player): boolean {
+        return true;
+    }
+
+    /** 
+     * Server- and clientside.
+     * Can be used on a non-constructed instance of the class.
+     * Checks general conditions.
+     */
     available(board: Board, card: PlacedCard, player: Player): boolean {
         return this.isResourcesAvailable(board, card, player) && this.availableCustom(board, card, player);
     }
@@ -75,6 +88,11 @@ export class MoveCardAction extends TargetedCardAction {
 
         return true;
     }
+    valid(board: Board, card: PlacedCard, player: Player): boolean {
+        let position = board.positionOf(card);
+        let delta = position.subtract(this.target).abs();
+        return (delta.x == 1 || delta.y == 1);
+    }
     highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
         let tiles: [BoardPosition, TileHighlightColor][] = [];
         let directions: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
@@ -109,6 +127,16 @@ export class MeleeAttackCardAction extends TargetedCardAction {
             return false;
 
         return true;
+    }
+    valid(board: Board, card: PlacedCard, player: Player): boolean {
+        let position = board.positionOf(card);
+        let delta = position.subtract(this.target).abs();
+        let inRange = (delta.x == 1 || delta.y == 1);
+
+        let tile = board.getTileAt(this.target);
+        let cardLast = tile.tryBorrowLast();
+        let cardValid = cardLast != undefined && cardLast.ownerIndex != player.playerIndex;
+        return inRange && cardValid;
     }
     highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
         let tiles: [BoardPosition, TileHighlightColor][] = [];

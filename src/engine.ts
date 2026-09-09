@@ -287,12 +287,15 @@ export class Game {
                 return;
             }
 
-            if (placedCardBoardDetails.topOfTile && cardAction.available(this.board, placedCard, player)) {
+            if (placedCardBoardDetails.topOfTile && cardAction.valid(this.board, placedCard, player) && cardAction.available(this.board, placedCard, player)) {
                 cardAction.use(this, placedCardBoardDetails.tile, placedCard, player);
                 if (cardAction.usesResources.length > 0) {
                     cardAction.useResources(this, placedCardBoardDetails.tile, placedCard, player);
                     this.sendPackets([new UpdateCardRoundDataServerPacket(placedCard.card.entityId, placedCard.card.roundData)]);
                 }
+            } else {
+                console.warn("Action cant be used on card.");
+                return;
             }
         }
         else if (packet instanceof PlaceCardPlayerPacket) {

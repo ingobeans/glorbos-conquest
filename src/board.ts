@@ -24,18 +24,38 @@ export class BoardPosition {
         return n;
     }
     add(v: BoardPositionAddable): BoardPosition {
-        let x: number;
-        let y: number;
-        if (v instanceof BoardPosition) {
-            x = v.x;
-            y = v.y;
-        } else {
-            x = v[0];
-            y = v[1];
-        }
-
-        let n = new BoardPosition(this.x + x, this.y + y);
+        let parsed = parseBoardPosititionAddable(v);
+        let n = new BoardPosition(this.x + parsed.x, this.y + parsed.y);
         return n;
     }
+    subtract(v: BoardPositionAddable): BoardPosition {
+        let parsed = parseBoardPosititionAddable(v);
+        let n = new BoardPosition(this.x - parsed.x, this.y - parsed.y);
+        return n;
+    }
+    length(): number {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+    lengthSum(): number {
+        return Math.abs(this.x) + Math.abs(this.y);
+    }
+    abs(): BoardPosition {
+        return new BoardPosition(Math.abs(this.x), Math.abs(this.y));
+    }
 }
-type BoardPositionAddable = [number, number] | BoardPosition;
+function parseBoardPosititionAddable(v: BoardPositionAddable): { x: number, y: number } {
+    let x: number;
+    let y: number;
+    if (v instanceof BoardPosition) {
+        x = v.x;
+        y = v.y;
+    } else if ("x" in v) {
+        return v;
+    }
+    else {
+        x = v[0];
+        y = v[1];
+    }
+    return { x: x, y: y };
+}
+type BoardPositionAddable = [number, number] | BoardPosition | { x: number, y: number };
