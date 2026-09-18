@@ -1,11 +1,19 @@
+html {
+    --text:black;
+    --bg: white;
+}
+
 body {
     margin: 0;
     min-height: 100vh;
     --tile-size: calc(min(10.7vh, 100px));
+    background-color: var(--bg);
+    font-family: Arial;
 }
 
 .dark-root {
-    background-color: #0e0e0e;
+    --bg: #0e0e0e;
+    --text:white;
 }
 
 .dark-root .held-card,
@@ -21,6 +29,29 @@ body {
 
 #darkmode-switch:hover {
     filter: brightness(0.8);
+}
+
+#card-info {  
+    --height: 60vh;
+    height: var(--height);
+    aspect-ratio: 0.7;
+    background-color: var(--bg);
+    border: 2px solid var(--text);
+    color: var(--text);
+    position: absolute;
+    right: 40px;
+    top: calc(50% - var(--height) / 2);
+    z-index: 5;
+}
+
+@media  (max-width: 1290px) {
+    #card-info {
+        right: 0px;
+    }  
+}
+
+#card-info > h2 {
+    text-align: center;
 }
 
 #game-grid {
