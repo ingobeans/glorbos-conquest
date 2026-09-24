@@ -36,12 +36,13 @@ body {
     height: var(--height);
     aspect-ratio: 0.7;
     background-color: var(--bg);
-    border: 2px solid var(--text);
+    border: 3px solid var(--text);
     color: var(--text);
     position: absolute;
     right: 40px;
     top: calc(50% - var(--height) / 2);
     z-index: 5;
+    border-radius: 4px;
 }
 
 @media  (max-width: 1290px) {
