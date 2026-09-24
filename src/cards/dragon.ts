@@ -8,11 +8,15 @@ class Dragon extends Card {
 }
 
 export function register() {
-    let types = [ElementType.Fire, ElementType.Water];
+    let types: [ElementType,string][] = [
+        [ElementType.Fire, "Red"],
+        [ElementType.Water, "Water"],
+    ];
     for (let type of types) {
         let card = new Dragon();
-        card.elementTypes[0] = type;
-        card.image = "dragons/" + ElementType[type].toLowerCase();
+        card.elementTypes[0] = type[0];
+        card.image = "dragons/" + ElementType[type[0]].toLowerCase();
+        card.name = `${type[1]} Dragon`;
         registerCard(card);
     }
 }
