@@ -163,10 +163,14 @@ export class Board {
         }
         return false;
     }
-    getHighlightedTiles(placedCard: PlacedCard, player: Player) {
+    getHighlightedTiles(placedCard: PlacedCard, player: Player, onlyShowHighlightedByDefault = true) {
         let highlights: [BoardPosition, TileHighlightColor][] = [];
         for (let action of placedCard.card.actions) {
             let actionInstance = new (<any>action).constructor();
+
+            if (onlyShowHighlightedByDefault && !actionInstance.highlightByDefault)
+                continue
+
             if (actionInstance.available(this, placedCard, player)) {
                 let tiles = action.highlightsTiles(this, placedCard, player);
                 highlights = highlights.concat(tiles);

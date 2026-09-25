@@ -16,6 +16,7 @@ export class CardAction {
     name: string = "unknown";
     icon: string = "placeholder";
     desc: string = "unknown";
+    highlightByDefault: boolean = false;
     usesResources: CardActionResource[] = [];
 
     /**  
@@ -81,6 +82,7 @@ export class TargetedCardAction extends CardAction {
 export class MoveCardAction extends TargetedCardAction {
     name = "Move";
     usesResources = [CardActionResource.Movement];
+    highlightByDefault = true;
     availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
         let highlightedTiles = this.highlightsTiles(board, card, player);
         if (highlightedTiles.length == 0)

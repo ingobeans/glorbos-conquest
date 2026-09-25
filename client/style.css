@@ -1,5 +1,5 @@
 html {
-    --text:black;
+    --text: black;
     --bg: white;
 }
 
@@ -13,7 +13,7 @@ body {
 
 .dark-root {
     --bg: #0e0e0e;
-    --text:white;
+    --text: white;
 }
 
 .dark-root .held-card,
@@ -31,10 +31,11 @@ body {
     filter: brightness(0.8);
 }
 
-#card-info {  
+#card-info {
     --height: 60vh;
+    --width: calc(var(--height) * 0.7);
     height: var(--height);
-    aspect-ratio: 0.7;
+    width: var(--width);
     background-color: var(--bg);
     border: 3px solid var(--text);
     color: var(--text);
@@ -45,14 +46,29 @@ body {
     border-radius: 4px;
 }
 
-@media  (max-width: 1290px) {
+@media (max-width: 1290px) {
     #card-info {
         right: 0px;
-    }  
+    }
 }
 
-#card-info > h2 {
+.card-info-action-container {
+    padding: 10px;
+    border: 1px solid;
+    margin: 5px;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.card-info-action-container-unavailable {
+    filter: grayscale(1) contrast(0.6) invert(0.1);
+}
+
+
+#card-info>h2 {
     text-align: center;
+    margin-bottom: 0;
+    font-size: calc(0.065 * var(--width));
 }
 
 #game-grid {
@@ -197,6 +213,15 @@ body {
 
 .card-heart {
     width: 15%;
+}
+
+#card-info-hearts>.card-heart {
+    width: calc(0.06 * var(--width));
+}
+
+#card-info-hearts {
+    width: fit-content;
+    margin: 0 auto;
 }
 
 .card-type {

@@ -13,6 +13,8 @@ let tilesHighlight = document.getElementById("tiles-highlight");
 let placedCardsContainer = document.getElementById("placed-cards");
 let cardInfo = <HTMLDivElement>document.getElementById("card-info");
 let cardInfoTitle = <HTMLElement>document.getElementById("card-info-title");
+let cardInfoHearts = <HTMLElement>document.getElementById("card-info-hearts");
+let cardInfoActions = <HTMLElement>document.getElementById("card-info-actions");
 
 export let activeClient: Client | undefined = undefined;
 
@@ -106,6 +108,27 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
         card = activeClient.board.findCardOnBoard(card).placedCard;
     }
     cardInfoTitle.innerText = card.card.name.toUpperCase();
+
+    cardInfoHearts.innerHTML = "";
+    addHearts(cardInfoHearts, card.card);
+
+    cardInfoActions.innerHTML = "";
+    for (let action of card.card.actions) {
+        let actionInstance = new (<any>action).constructor();
+        let div = document.createElement("div");
+        div.classList.add("card-info-action-container");
+        let available = actionInstance.available(activeClient.board, card, activeClient.player)
+        if (!available) {
+            div.classList.add("card-info-action-container-unavailable");
+        }
+
+        let name = document.createElement("span");
+        name.innerText = actionInstance.name;
+        div.appendChild(name);
+
+        cardInfoActions.appendChild(div);
+    }
+
     cardInfo.style.display = "";
 }
 
@@ -208,7 +231,7 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
         let pressedAction: CardAction | null = null;
         for (let action of selectedTile.placedCard.card.actions) {
             let actionInstance = new (<any>action).constructor();
-            if (actionInstance.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
+            if (actionInstance.highlightByDefault && actionInstance.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
                 let tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
                 for (let tile of tiles) {
                     if (tile[0].equals(position)) {
