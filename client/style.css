@@ -246,13 +246,17 @@ body {
     width: 15%;
 }
 
-#card-info-hearts>.card-heart {
+.card-info-hearts>.card-heart {
     width: calc(0.06 * var(--width));
 }
 
-#card-info-hearts {
+.card-info-hearts {
     width: fit-content;
     margin: 0 auto;
+}
+
+.card-info-action-hearts {
+    margin: 0 5px;
 }
 
 .card-type {

@@ -6,6 +6,7 @@ import { Board, Game, PlacedCard } from "../engine";
 import { Client } from "./client";
 import { CardActionPlayerPacket, PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
 import { CardAction, TargetedCardAction, TileHighlightColor } from "../card_actions";
+import { addHearts } from "../header_row_items";
 
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
@@ -130,6 +131,10 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
         name.innerText = actionInstance.name;
         name.classList.add("card-info-action-name");
         headerRow.appendChild(name);
+
+        for (let item of actionInstance.getHeaderRowItems()) {
+            headerRow.appendChild(item.generateElement(card));
+        }
 
         let desc = document.createElement("span");
         desc.innerText = actionInstance.desc;
@@ -292,30 +297,6 @@ function updateHearts(cardEntityId: number) {
 
     removeChildren(container);
     addHearts(container, activeClient.board.findCardOnBoard(cardEntityId).placedCard.card);
-}
-
-function addHearts(parent: HTMLElement, card: Card) {
-    for (let i = 0; i < card.maxHealth / 2; i++) {
-        let image = document.createElement("img");
-        image.classList.add("card-heart");
-        let heartType = "heart_full";
-        if (i != card.maxHealth / 2 && i == Math.floor(card.maxHealth / 2)) {
-            heartType = "heart_half";
-        }
-        if (card.health / 2 <= i) {
-            heartType += "_missing";
-        } else if (Math.floor(card.health / 2) <= i && heartType != "heart_half") {
-            heartType += "_missing_half";
-        }
-        else {
-            heartType += "_present";
-        }
-        if (heartType == "heart_half_missing_half") {
-            heartType = "heart_half_missing";
-        }
-        image.src = `assets/graphics/${heartType}.png`;
-        parent.appendChild(image);
-    }
 }
 
 function createCardElement(card: Card): HTMLDivElement {

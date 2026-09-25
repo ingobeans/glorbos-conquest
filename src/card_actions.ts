@@ -1,5 +1,6 @@
 import { BoardPosition } from "./board";
 import { Board, Game, PlacedCard, Player, Tile } from "./engine";
+import { ActionHeaderRowItem, HeartHeaderRowItem } from "./header_row_items";
 import { DamageServerPacket, MoveCardServerPacket } from "./server_packets";
 
 export enum TileHighlightColor {
@@ -12,12 +13,17 @@ export enum CardActionResource {
     Attack,
 }
 
+
 export class CardAction {
     name: string = "unknown";
     icon: string = "placeholder";
     desc: string = "unknown";
     highlightByDefault: boolean = false;
     usesResources: CardActionResource[] = [];
+
+    getHeaderRowItems(card: PlacedCard): ActionHeaderRowItem[] {
+        return [];
+    }
 
     /**  
      * Serverside. 
@@ -125,6 +131,9 @@ export class MeleeAttackCardAction extends TargetedCardAction {
     name = "Melee Attack";
     desc = "Attack an adjacent tile";
     usesResources = [CardActionResource.Attack];
+    getHeaderRowItems(card: PlacedCard): ActionHeaderRowItem[] {
+        return [new HeartHeaderRowItem(1)]
+    }
     availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
         let highlightedTiles = this.highlightsTiles(board, card, player);
         if (highlightedTiles.length == 0)
