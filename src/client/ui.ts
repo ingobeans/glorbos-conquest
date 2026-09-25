@@ -11,6 +11,8 @@ let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
 let tilesHighlight = document.getElementById("tiles-highlight");
 let placedCardsContainer = document.getElementById("placed-cards");
+let cardInfo = <HTMLDivElement>document.getElementById("card-info");
+let cardInfoTitle = <HTMLElement>document.getElementById("card-info-title");
 
 export let activeClient: Client | undefined = undefined;
 
@@ -91,6 +93,20 @@ function handleReceivedPacket(packet: ServerPacket) {
     else {
         console.warn("Unhandled packet");
     }
+}
+
+function displayCardInfo(card:PlacedCard|number|undefined) {
+    if (card == undefined) {
+        cardInfo.style.display = "none";
+        return;
+    }
+    if (!activeClient)
+        return;
+    if (typeof card == "number") {
+        card = activeClient.board.findCardOnBoard(card).placedCard;
+    }
+    cardInfoTitle.innerText = card.card.name.toUpperCase();
+    cardInfo.style.display = "";
 }
 
 let highlightColorToHueRotate = {
@@ -215,6 +231,7 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
 
     let placedCard = activeClient.board.tiles[id]?.tryBorrowLast();
 
+    displayCardInfo(placedCard);
 
     if (!placedCard) {
         stopSelectingTile();
