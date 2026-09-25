@@ -52,6 +52,10 @@ body {
     }
 }
 
+.card-info-action-name {
+    font-weight: bold;
+}
+
 .card-info-action-desc {
     display: block;
 }

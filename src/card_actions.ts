@@ -81,6 +81,7 @@ export class TargetedCardAction extends CardAction {
 
 export class MoveCardAction extends TargetedCardAction {
     name = "Move";
+    desc = "Move one tile in any direction";
     usesResources = [CardActionResource.Movement];
     highlightByDefault = true;
     availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
@@ -122,6 +123,7 @@ export class MoveCardAction extends TargetedCardAction {
 
 export class MeleeAttackCardAction extends TargetedCardAction {
     name = "Melee Attack";
+    desc = "Attack an adjacent tile";
     usesResources = [CardActionResource.Attack];
     availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
         let highlightedTiles = this.highlightsTiles(board, card, player);
