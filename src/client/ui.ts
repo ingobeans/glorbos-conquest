@@ -95,7 +95,7 @@ function handleReceivedPacket(packet: ServerPacket) {
     }
 }
 
-function displayCardInfo(card:PlacedCard|number|undefined) {
+function displayCardInfo(card: PlacedCard | number | undefined) {
     if (card == undefined) {
         cardInfo.style.display = "none";
         return;
@@ -233,12 +233,11 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
 
     displayCardInfo(placedCard);
 
+    stopSelectingTile();
     if (!placedCard) {
-        stopSelectingTile();
         return;
     }
     if (placedCard.ownerIndex != activeClient.player.playerIndex) {
-        stopSelectingTile();
         return;
     }
     selectedTile = { placedCard: placedCard, position: position };
