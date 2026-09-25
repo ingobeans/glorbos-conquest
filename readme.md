@@ -4,6 +4,12 @@
 
 ## building
 
+watch for changes and build automatically:
 ```bash
-tsc && esbuild --bundle dist/client/client.js > client/client.js
+npm run watch
+```
+
+build once:
+```bash
+npm run build
 ```
