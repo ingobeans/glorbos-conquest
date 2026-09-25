@@ -122,8 +122,8 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
         let headerRow = document.createElement("div");
         headerRow.classList.add("card-info-action-header-row");
 
-        let available = actionInstance.available(activeClient.board, card, activeClient.player)
-        if (!available) {
+        let unavailable = card.ownerIndex != activeClient.player.playerIndex || !actionInstance.available(activeClient.board, card, activeClient.player);
+        if (unavailable) {
             container.classList.add("card-info-action-container-unavailable");
         }
 
