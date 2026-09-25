@@ -67,6 +67,11 @@ body {
     transition: max-height 0.1s;
 }
 
+.card-info-action-header-row {
+    display: flex;
+    height: 1lh;
+}
+
 .card-info-action-container-unavailable {
     filter: grayscale(1) contrast(0.6) invert(0.1);
 }

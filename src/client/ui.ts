@@ -115,24 +115,29 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
     cardInfoActions.innerHTML = "";
     for (let action of card.card.actions) {
         let actionInstance = new (<any>action).constructor();
-        let div = document.createElement("div");
-        div.classList.add("card-info-action-container");
+        let container = document.createElement("div");
+        container.classList.add("card-info-action-container");
+
+        let headerRow = document.createElement("div");
+        headerRow.classList.add("card-info-action-header-row");
+
         let available = actionInstance.available(activeClient.board, card, activeClient.player)
         if (!available) {
-            div.classList.add("card-info-action-container-unavailable");
+            container.classList.add("card-info-action-container-unavailable");
         }
 
         let name = document.createElement("span");
         name.innerText = actionInstance.name;
         name.classList.add("card-info-action-name");
-        div.appendChild(name);
+        headerRow.appendChild(name);
 
         let desc = document.createElement("span");
         desc.innerText = actionInstance.desc;
         name.classList.add("card-info-action-desc");
-        div.appendChild(desc);
 
-        cardInfoActions.appendChild(div);
+        container.appendChild(headerRow);
+        container.appendChild(desc);
+        cardInfoActions.appendChild(container);
     }
 
     cardInfo.style.display = "";
