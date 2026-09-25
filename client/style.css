@@ -52,18 +52,40 @@ body {
     }
 }
 
+.card-info-action-desc {
+    display: block;
+}
+
 .card-info-action-container {
     padding: 10px;
     border: 1px solid;
     margin: 5px;
     background-color: var(--bg);
     color: var(--text);
+    max-height: 1lh;
+    overflow: hidden;
+    transition: max-height 0.1s;
 }
 
 .card-info-action-container-unavailable {
     filter: grayscale(1) contrast(0.6) invert(0.1);
 }
 
+.card-info-action-container:hover {
+    max-height: 5lh !important;
+}
+
+.card-info-action-container:hover>* {
+    visibility: visible !important;
+}
+
+.card-info-action-container>* {
+    visibility: hidden;
+}
+
+.card-info-action-container>*:nth-child(1) {
+    visibility: visible;
+}
 
 #card-info>h2 {
     text-align: center;

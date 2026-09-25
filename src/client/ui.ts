@@ -124,7 +124,13 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
 
         let name = document.createElement("span");
         name.innerText = actionInstance.name;
+        name.classList.add("card-info-action-name");
         div.appendChild(name);
+
+        let desc = document.createElement("span");
+        desc.innerText = actionInstance.desc;
+        name.classList.add("card-info-action-desc");
+        div.appendChild(desc);
 
         cardInfoActions.appendChild(div);
     }
