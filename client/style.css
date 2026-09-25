@@ -41,7 +41,7 @@ body {
     display: inline-block;
     width: var(--tile-size);
     aspect-ratio: 1;
-    background-color: #bfdb59;
+    background-color: #88db59;
     margin-left: var(--gap);
     margin-bottom: var(--gap);
     background-image: url("assets/grass.png");
@@ -56,7 +56,7 @@ body {
 }
 
 .tile:nth-child(odd) {
-    background-color: #aac83b;
+    background-color: #67c83b;
 }
 
 #player-deck {
