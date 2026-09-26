@@ -98,12 +98,17 @@ function handleReceivedPacket(packet: ServerPacket) {
     }
 }
 
-function clickCardInfoAction(index: number) {
+function clickCardInfoAction(element: HTMLDivElement, index: number) {
     if (!selectedTile.position)
         return;
+    if (selectedTile.selectedCardAction != null) {
+        let parent = element.parentElement;
+        let previous = parent?.children[selectedTile.selectedCardAction];
+        previous?.classList.remove("card-info-action-container-selected");
+    }
     selectedTile.selectedCardAction = index;
     clickTile(selectedTile.position);
-    console.log(index);
+    element.classList.add("card-info-action-container-selected");
 }
 
 function displayCardInfo(card: PlacedCard | number | undefined) {
@@ -134,7 +139,7 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
         if (unavailable) {
             container.classList.add("card-info-action-container-unavailable");
         } else {
-            container.onclick = clickCardInfoAction.bind(null, index);
+            container.onclick = clickCardInfoAction.bind(null, container, index);
         }
 
         let name = document.createElement("span");
@@ -256,16 +261,16 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
 
     if (selectedTile.placedCard) {
         let pressedAction: CardAction | null = null;
-        for (let [index, action] of selectedTile.placedCard.card.actions.entries()) {
-            if (selectedTile.selectedCardAction != null && index != selectedTile.selectedCardAction)
-                continue
-
-            let actionInstance = new (<any>action).constructor();
-            if (selectedTile.selectedCardAction != null || (actionInstance.highlightByDefault && actionInstance.available(activeClient.board, selectedTile.placedCard, activeClient.player))) {
-                let tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
-                for (let tile of tiles) {
-                    if (tile[0].equals(position)) {
-                        pressedAction = action;
+        if (selectedTile.selectedCardAction != null) {
+            let action = selectedTile.placedCard.card.actions[selectedTile.selectedCardAction];
+            if (action) {
+                let actionInstance = <CardAction>(new (<any>action).constructor());
+                if (actionInstance.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
+                    let tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
+                    for (let tile of tiles) {
+                        if (tile[0].equals(position)) {
+                            pressedAction = action;
+                        }
                     }
                 }
             }
@@ -301,7 +306,7 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     if (placedCard.ownerIndex != activeClient.player.playerIndex) {
         return;
     }
-    selectedTile = { placedCard: placedCard, position: position, selectedCardAction: null };
+    selectedTile = { placedCard: placedCard, position: position, selectedCardAction: 0 };
     if (same) {
         selectedTile.selectedCardAction = oldActionIndex;
         console.log("same");
@@ -309,9 +314,10 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
 
     if (selectedTile.selectedCardAction != null) {
         let action = <CardAction>placedCard.card.actions[selectedTile.selectedCardAction];
-        highlightTiles(action.highlightsTiles(activeClient.board, placedCard, activeClient.player))
-    } else {
-        highlightTiles(activeClient.board.getHighlightedTiles(placedCard, activeClient.player));
+        let actionInstance = <CardAction>(new (<any>action).constructor());
+        if (actionInstance.available(activeClient.board, placedCard, activeClient.player)) {
+            highlightTiles(action.highlightsTiles(activeClient.board, placedCard, activeClient.player))
+        }
     }
 
     let cardElement = document.querySelector(`.placed-card[entityId='${placedCard?.card.entityId.toString()}']`);
