@@ -21,7 +21,11 @@ export class CardAction {
     usesResources: CardActionResource[] = [];
 
     getHeaderRowItems(card: PlacedCard): ActionHeaderRowItem[] {
-        return [];
+        let items: ActionHeaderRowItem[] = [];
+        if ("damage" in this && typeof this.damage == "number") {
+            items.push(new HeartHeaderRowItem(this.damage));
+        }
+        return items;
     }
 
     /**  
@@ -131,9 +135,6 @@ export class MeleeAttackCardAction extends TargetedCardAction {
     usesResources = [CardActionResource.Attack];
     damage = 1;
 
-    getHeaderRowItems(card: PlacedCard): ActionHeaderRowItem[] {
-        return [new HeartHeaderRowItem(this.damage)]
-    }
     availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
         let highlightedTiles = this.highlightsTiles(board, card, player);
         if (highlightedTiles.length == 0)
@@ -204,6 +205,7 @@ export class BreathAttackCardAction extends BeamAttackCardAction {
     name = "Fire Breath";
     desc = "Fires a concentrated beam of fire.";
     range = 2;
+    damage = 3;
     color = TileHighlightColor.Red;
 }
 
