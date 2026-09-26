@@ -84,15 +84,14 @@ body {
 }
 
 .card-info-action-container-selected {
-    filter: unset;
-    transform: translate(2px, 2px);
+    filter: invert(0.1);
 }
 
-.card-info-action-container:hover {
+.card-info-action-container-selected {
     max-height: 5lh !important;
 }
 
-.card-info-action-container:hover>* {
+.card-info-action-container-selected>* {
     visibility: visible !important;
 }
 

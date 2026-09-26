@@ -140,6 +140,9 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
             container.classList.add("card-info-action-container-unavailable");
         } else {
             container.onclick = clickCardInfoAction.bind(null, container, index);
+            if (index == selectedTile.selectedCardAction) {
+                container.classList.add("card-info-action-container-selected");
+            }
         }
 
         let name = document.createElement("span");
@@ -295,7 +298,10 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     let same = (selectedTile.position != null && (position.x == selectedTile.position.x && position.y == selectedTile.position.y));
     let oldActionIndex = selectedTile.selectedCardAction;
 
+    let newSelectedCardAction = 0;
+
     if (!same) {
+        selectedTile.selectedCardAction = newSelectedCardAction;
         displayCardInfo(placedCard);
     }
 
@@ -306,7 +312,7 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     if (placedCard.ownerIndex != activeClient.player.playerIndex) {
         return;
     }
-    selectedTile = { placedCard: placedCard, position: position, selectedCardAction: 0 };
+    selectedTile = { placedCard: placedCard, position: position, selectedCardAction: newSelectedCardAction };
     if (same) {
         selectedTile.selectedCardAction = oldActionIndex;
         console.log("same");
