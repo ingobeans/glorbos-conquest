@@ -129,8 +129,10 @@ export class MeleeAttackCardAction extends TargetedCardAction {
     name = "Melee Attack";
     desc = "Attack an adjacent tile";
     usesResources = [CardActionResource.Attack];
+    damage = 1;
+
     getHeaderRowItems(card: PlacedCard): ActionHeaderRowItem[] {
-        return [new HeartHeaderRowItem(1)]
+        return [new HeartHeaderRowItem(this.damage)]
     }
     availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
         let highlightedTiles = this.highlightsTiles(board, card, player);
@@ -173,7 +175,7 @@ export class MeleeAttackCardAction extends TargetedCardAction {
 
         let packets = [];
 
-        if (victim.card.damage(1).died) {
+        if (victim.card.damage(this.damage).died) {
             // if victim dies from this attack,
             // move attacker into its space
 
@@ -182,7 +184,7 @@ export class MeleeAttackCardAction extends TargetedCardAction {
             targetTile.cards.push(taken);
             packets.push(new MoveCardServerPacket(card.card.entityId, this.target));
         }
-        packets.push(new DamageServerPacket(card.card.entityId, victim.card.entityId, 1));
+        packets.push(new DamageServerPacket(card.card.entityId, victim.card.entityId, this.damage));
         game.sendPackets(packets);
     }
 }
