@@ -98,6 +98,14 @@ function handleReceivedPacket(packet: ServerPacket) {
     }
 }
 
+function clickCardInfoAction(index: number) {
+    if (!selectedTile.position)
+        return;
+    selectedTile.selectedCardAction = index;
+    clickTile(selectedTile.position);
+    console.log(index);
+}
+
 function displayCardInfo(card: PlacedCard | number | undefined) {
     if (card == undefined) {
         cardInfo.style.display = "none";
@@ -114,7 +122,7 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
     addHearts(cardInfoHearts, card.card);
 
     cardInfoActions.innerHTML = "";
-    for (let action of card.card.actions) {
+    for (let [index, action] of card.card.actions.entries()) {
         let actionInstance = new (<any>action).constructor();
         let container = document.createElement("div");
         container.classList.add("card-info-action-container");
@@ -125,6 +133,8 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
         let unavailable = card.ownerIndex != activeClient.player.playerIndex || !actionInstance.available(activeClient.board, card, activeClient.player);
         if (unavailable) {
             container.classList.add("card-info-action-container-unavailable");
+        } else {
+            container.onclick = clickCardInfoAction.bind(null, index);
         }
 
         let name = document.createElement("span");
@@ -219,6 +229,7 @@ function createGridElements(board: Board) {
 let selectedTile = {
     placedCard: <PlacedCard | null>null,
     position: <BoardPosition | null>null,
+    selectedCardAction: <number | null>null,
 };
 function stopSelectingTile() {
     let cardElement = document.querySelector(`.placed-card[entityId='${selectedTile.placedCard?.card.entityId.toString()}']`);
@@ -245,9 +256,12 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
 
     if (selectedTile.placedCard) {
         let pressedAction: CardAction | null = null;
-        for (let action of selectedTile.placedCard.card.actions) {
+        for (let [index, action] of selectedTile.placedCard.card.actions.entries()) {
+            if (selectedTile.selectedCardAction != null && index != selectedTile.selectedCardAction)
+                continue
+
             let actionInstance = new (<any>action).constructor();
-            if (actionInstance.highlightByDefault && actionInstance.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
+            if (selectedTile.selectedCardAction != null || (actionInstance.highlightByDefault && actionInstance.available(activeClient.board, selectedTile.placedCard, activeClient.player))) {
                 let tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
                 for (let tile of tiles) {
                     if (tile[0].equals(position)) {
@@ -259,6 +273,7 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
         if (pressedAction) {
             if (pressedAction instanceof TargetedCardAction) {
                 let instance = new (<any>pressedAction).constructor(position);
+                selectedTile.selectedCardAction = null;
                 sendPlayerPacket(new CardActionPlayerPacket(
                     selectedTile.placedCard.card.entityId,
                     instance
@@ -272,6 +287,8 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
 
     displayCardInfo(placedCard);
 
+    let same = (selectedTile.position != null && (position.x == selectedTile.position.x && position.y == selectedTile.position.y));
+    let oldActionIndex = selectedTile.selectedCardAction;
     stopSelectingTile();
     if (!placedCard) {
         return;
@@ -279,9 +296,18 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     if (placedCard.ownerIndex != activeClient.player.playerIndex) {
         return;
     }
-    selectedTile = { placedCard: placedCard, position: position };
+    selectedTile = { placedCard: placedCard, position: position, selectedCardAction: null };
+    if (same) {
+        selectedTile.selectedCardAction = oldActionIndex;
+        console.log("same");
+    }
 
-    highlightTiles(activeClient.board.getHighlightedTiles(placedCard, activeClient.player));
+    if (selectedTile.selectedCardAction != null) {
+        let action = <CardAction>placedCard.card.actions[selectedTile.selectedCardAction];
+        highlightTiles(action.highlightsTiles(activeClient.board, placedCard, activeClient.player))
+    } else {
+        highlightTiles(activeClient.board.getHighlightedTiles(placedCard, activeClient.player));
+    }
 
     let cardElement = document.querySelector(`.placed-card[entityId='${placedCard?.card.entityId.toString()}']`);
     if (cardElement) {

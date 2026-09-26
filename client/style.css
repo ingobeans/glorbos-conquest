@@ -61,6 +61,7 @@ body {
 }
 
 .card-info-action-container {
+    cursor: pointer;
     padding: 10px;
     border: 1px solid;
     margin: 5px;
@@ -78,6 +79,7 @@ body {
 
 .card-info-action-container-unavailable {
     filter: grayscale(1) contrast(0.6) invert(0.1);
+    cursor: unset !important;
 }
 
 .card-info-action-container:hover {
