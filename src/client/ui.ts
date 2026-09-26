@@ -16,6 +16,7 @@ let cardInfo = <HTMLDivElement>document.getElementById("card-info");
 let cardInfoTitle = <HTMLElement>document.getElementById("card-info-title");
 let cardInfoHearts = <HTMLElement>document.getElementById("card-info-hearts");
 let cardInfoActions = <HTMLElement>document.getElementById("card-info-actions");
+let beamAttackOrigin = <HTMLElement>document.getElementById("beam-attack-origin");
 
 export let activeClient: Client | undefined = undefined;
 
@@ -98,14 +99,34 @@ function handleReceivedPacket(packet: ServerPacket) {
     }
 }
 
+function hideSelectedActionUI() {
+    highlightTiles([]);
+    beamAttackOrigin.style.display = "none";
+}
+
+function updateBeamAttackAngle(): number {
+    let rect = beamAttackOrigin.getBoundingClientRect();
+    let deltaX = mouseX - rect.x;
+    let deltaY = mouseY - rect.y;
+    let angle = Math.atan2(deltaY, deltaX);
+    beamAttackOrigin.style.rotate = (angle - Math.PI / 2.0) + "rad";
+    return angle;
+}
+
 function showSelectedActionUI(action: CardAction, card: PlacedCard) {
     if (!activeClient)
         return;
-    highlightTiles([]);
+    hideSelectedActionUI();
+
     if (action instanceof TargetedCardAction) {
         highlightTiles(action.highlightsTiles(activeClient.board, card, activeClient.player));
     } else if (action instanceof BeamAttackCardAction) {
-
+        let element = <HTMLDivElement>document.querySelector(`.placed-card[entityId='${card.card.entityId.toString()}']`);
+        beamAttackOrigin.style.setProperty("--x", element.style.getPropertyValue("--x"));
+        beamAttackOrigin.style.setProperty("--y", element.style.getPropertyValue("--y"));
+        beamAttackOrigin.style.setProperty("--length", action.range.toString());
+        beamAttackOrigin.style.display = "";
+        updateBeamAttackAngle();
     }
 }
 
@@ -260,7 +281,7 @@ function stopSelectingTile() {
     }
     selectedTile.position = null;
     selectedTile.placedCard = null;
-    highlightTiles([]);
+    hideSelectedActionUI();
 }
 function clickTile(element: HTMLDivElement | BoardPosition) {
     if (!activeClient)
@@ -458,9 +479,7 @@ function getMousePlayerDeckZone(mouseX: number, mouseY: number): number {
     return -1;
 }
 
-document.addEventListener("mouseup", (_) => {
-    if (!drag.active)
-        return;
+function dragMouseUp() {
     drag.active = false;
 
     drag.element?.classList.remove("dragged-card");
@@ -479,10 +498,9 @@ document.addEventListener("mouseup", (_) => {
     drag.element?.style.setProperty("--x", "");
     drag.element?.style.setProperty("--y", "");
     drag.element?.style.setProperty("--index", drag.deckZone.toString());
-});
-document.addEventListener("mousemove", (event) => {
-    if (!drag.active)
-        return;
+}
+
+function dragMouseMove(event: MouseEvent) {
     drag.mouseX = event.clientX;
     drag.mouseY = event.clientY;
     let deltaX = drag.mouseX - drag.startX;
@@ -516,6 +534,26 @@ document.addEventListener("mousemove", (event) => {
             item.element.id = "held-card-" + (item.index - direction).toString();
         }
         drag.element.id = "held-card-" + deckZone.toString();
+    }
+}
+let mouseX = 0;
+let mouseY = 0;
+
+document.addEventListener("mouseup", (_) => {
+    if (drag.active) {
+        dragMouseUp(); return
+    }
+});
+document.addEventListener("mousemove", (event) => {
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+
+    if (drag.active) {
+        dragMouseMove(event);
+        return;
+    }
+    if (beamAttackOrigin.style.display != "none") {
+        updateBeamAttackAngle();
     }
 });
 

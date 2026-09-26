@@ -182,6 +182,26 @@ body {
     }
 }
 
+#beam-attack-origin {
+    --x: 3;
+    --y: 2;
+    --length: 1;
+    z-index: 6;
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: calc(var(--x) * var(--tile-size) + var(--tile-size) / 2.0);
+    top: calc(var(--y) * var(--tile-size) + var(--tile-size) / 2.0);
+}
+
+#beam-attack-area {
+    width: calc(var(--tile-size) / 2);
+    height: calc(var(--tile-size) * (var(--length) + 0.5));
+    transform: translateX(-50%);
+    background-color: #f64040b2;
+    border: 1px solid #f00;
+}
+
 .placed-card {
     --width: calc(0.72 * var(--tile-size));
     --offset-x: 0px;
