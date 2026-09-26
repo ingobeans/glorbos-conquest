@@ -279,6 +279,8 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
                     instance
                 ));
             }
+            let placedCard = activeClient.board.findCardOnBoard(selectedTile.placedCard).placedCard;
+            displayCardInfo(placedCard);
             return;
         }
     }
