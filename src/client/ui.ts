@@ -5,7 +5,7 @@ import { ElementType } from "../elements";
 import { Board, Game, PlacedCard } from "../engine";
 import { Client } from "./client";
 import { CardActionPlayerPacket, PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
-import { CardAction, TargetedCardAction, TileHighlightColor } from "../card_actions";
+import { BeamAttackCardAction, CardAction, TargetedCardAction, TileHighlightColor } from "../card_actions";
 import { addHearts } from "../header_row_items";
 
 let gameGrid = document.getElementById("game-grid");
@@ -98,6 +98,17 @@ function handleReceivedPacket(packet: ServerPacket) {
     }
 }
 
+function showSelectedActionUI(action: CardAction, card: PlacedCard) {
+    if (!activeClient)
+        return;
+    highlightTiles([]);
+    if (action instanceof TargetedCardAction) {
+        highlightTiles(action.highlightsTiles(activeClient.board, card, activeClient.player));
+    } else if (action instanceof BeamAttackCardAction) {
+
+    }
+}
+
 function clickCardInfoAction(element: HTMLDivElement, index: number) {
     if (!selectedTile.position)
         return;
@@ -106,9 +117,12 @@ function clickCardInfoAction(element: HTMLDivElement, index: number) {
         let previous = parent?.children[selectedTile.selectedCardAction];
         previous?.classList.remove("card-info-action-container-selected");
     }
-    selectedTile.selectedCardAction = index;
-    clickTile(selectedTile.position);
     element.classList.add("card-info-action-container-selected");
+    selectedTile.selectedCardAction = index;
+
+    let card = <PlacedCard>selectedTile.placedCard;
+    let actionInstance = new (<any>card.card.actions[index]).constructor();
+    showSelectedActionUI(actionInstance, card)
 }
 
 function displayCardInfo(card: PlacedCard | number | undefined) {

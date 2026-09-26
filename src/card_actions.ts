@@ -189,6 +189,23 @@ export class MeleeAttackCardAction extends TargetedCardAction {
     }
 }
 
+export class BeamAttackCardAction extends CardAction {
+    /** Angle of beam attack in radians */
+    angle: number;
+    range: number = 2;
+    color: TileHighlightColor = TileHighlightColor.Red;
+    constructor(angle: number) {
+        super();
+        this.angle = angle;
+    }
+}
+
+export class BreathAttackCardAction extends BeamAttackCardAction {
+    name = "Fire Breath";
+    desc = "Fires a concentrated beam of fire.";
+    range = 2;
+    color = TileHighlightColor.Red;
+}
 
 /** List of all cardActions. 
  * Every card action class must be listed here to be valid.
