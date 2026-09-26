@@ -285,10 +285,13 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
 
     let placedCard = activeClient.board.tiles[id]?.tryBorrowLast();
 
-    displayCardInfo(placedCard);
-
     let same = (selectedTile.position != null && (position.x == selectedTile.position.x && position.y == selectedTile.position.y));
     let oldActionIndex = selectedTile.selectedCardAction;
+
+    if (!same) {
+        displayCardInfo(placedCard);
+    }
+
     stopSelectingTile();
     if (!placedCard) {
         return;
