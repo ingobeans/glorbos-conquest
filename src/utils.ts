@@ -80,5 +80,16 @@ export function decodePacket<Type>(encoded: string | EncodedPacket<Type>, regist
     let extractedPacket = Object.setPrototypeOf(encodedPacket.value, type);
     return extractedPacket;
 }
+export interface Equals<T> {
+    equals(other: T): boolean
+}
+export function arrayIndexOf<T>(array: Equals<T>[], test: T): number {
+    for (let [i, item] of Object.entries(array)) {
+        if (item.equals(test)) {
+            return parseInt(i);
+        }
+    }
+    return -1;
+}
 
 (<any>globalThis).clone = clone;

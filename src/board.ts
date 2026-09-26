@@ -1,5 +1,5 @@
 import { Board } from "./engine";
-import { clamp } from "./utils";
+import { arrayIndexOf, clamp } from "./utils";
 
 export class BoardPosition {
     x: number;
@@ -17,19 +17,19 @@ export class BoardPosition {
     isOutsideBoard(board: Board): boolean {
         return this.x < 0 || this.x >= board.size || this.y < 0 || this.y >= board.size;
     }
-    saturatingAdd(v: BoardPositionAddable, board: Board): BoardPosition {
+    saturatingAdd(v: BoardPositionLike, board: Board): BoardPosition {
         let n = this.add(v);
         n.x = clamp(n.x, 0, board.size);
         n.y = clamp(n.y, 0, board.size);
         return n;
     }
-    add(v: BoardPositionAddable): BoardPosition {
-        let parsed = parseBoardPosititionAddable(v);
+    add(v: BoardPositionLike): BoardPosition {
+        let parsed = parseBoardPosititionLike(v);
         let n = new BoardPosition(this.x + parsed.x, this.y + parsed.y);
         return n;
     }
-    subtract(v: BoardPositionAddable): BoardPosition {
-        let parsed = parseBoardPosititionAddable(v);
+    subtract(v: BoardPositionLike): BoardPosition {
+        let parsed = parseBoardPosititionLike(v);
         let n = new BoardPosition(this.x - parsed.x, this.y - parsed.y);
         return n;
     }
@@ -41,6 +41,9 @@ export class BoardPosition {
         }
         return new BoardPosition(this.x / length, this.y / length);
     }
+    floor(): BoardPosition {
+        return new BoardPosition(Math.floor(this.x), Math.floor(this.y));
+    }
     length(): number {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
@@ -51,19 +54,43 @@ export class BoardPosition {
         return new BoardPosition(Math.abs(this.x), Math.abs(this.y));
     }
 }
-function parseBoardPosititionAddable(v: BoardPositionAddable): { x: number, y: number } {
+function parseBoardPosititionLike(v: BoardPositionLike): BoardPosition {
     let x: number;
     let y: number;
-    if (v instanceof BoardPosition) {
+    if (typeof v == "number") {
+        x = v;
+        y = v;
+    }
+    else if (v instanceof BoardPosition) {
+        return v;
+    } else if ("x" in v) {
         x = v.x;
         y = v.y;
-    } else if ("x" in v) {
-        return v;
     }
     else {
         x = v[0];
         y = v[1];
     }
-    return { x: x, y: y };
+    return new BoardPosition(x, y);
 }
-type BoardPositionAddable = [number, number] | BoardPosition | { x: number, y: number };
+export type BoardPositionLike = [number, number] | BoardPosition | { x: number, y: number } | number;
+
+export function drawLine(from: BoardPositionLike, angle: number, maxLength: number) {
+    let fromParsed = parseBoardPosititionLike(from);
+    const stepSize = 0.2;
+    let stepX = Math.cos(angle) * stepSize;
+    let stepY = Math.sin(angle) * stepSize;
+    let pos = fromParsed.add(0.5);
+    let tiles: BoardPosition[] = [];
+    while (true) {
+        let currentTile = pos.floor();
+        if (arrayIndexOf(tiles, currentTile) == -1) {
+            tiles.push(currentTile);
+            if (tiles.length >= maxLength) {
+                return tiles;
+            }
+        }
+        pos.x += stepX;
+        pos.y += stepY;
+    }
+}

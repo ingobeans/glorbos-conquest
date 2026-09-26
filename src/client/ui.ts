@@ -1,5 +1,5 @@
 import { DamageServerPacket, MoveCardServerPacket, PlaceCardServerPacket, ServerPacket, UpdateCardRoundDataServerPacket } from "../server_packets";
-import { BoardPosition } from "../board";
+import { BoardPosition, drawLine } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
 import { Board, Game, PlacedCard } from "../engine";
@@ -104,12 +104,22 @@ function hideSelectedActionUI() {
     beamAttackOrigin.style.display = "none";
 }
 
-function updateBeamAttackAngle(): number {
+function updateBeamAttack(): number {
+    if (!activeClient || !selectedTile.position)
+        return 0;
     let rect = beamAttackOrigin.getBoundingClientRect();
     let deltaX = mouseX - rect.x;
     let deltaY = mouseY - rect.y;
     let angle = Math.atan2(deltaY, deltaX);
     beamAttackOrigin.style.rotate = (angle - Math.PI / 2.0) + "rad";
+
+
+    let tiles = drawLine(selectedTile.position, angle, parseInt(beamAttackOrigin.style.getPropertyValue("--length")) + 1)
+    let highlights: [BoardPosition, TileHighlightColor][] = []
+    for (let tile of tiles) {
+        highlights.push([tile, TileHighlightColor.Red]);
+    }
+    highlightTiles(highlights);
     return angle;
 }
 
@@ -126,7 +136,7 @@ function showSelectedActionUI(action: CardAction, card: PlacedCard) {
         beamAttackOrigin.style.setProperty("--y", element.style.getPropertyValue("--y"));
         beamAttackOrigin.style.setProperty("--length", action.range.toString());
         beamAttackOrigin.style.display = "";
-        updateBeamAttackAngle();
+        updateBeamAttack();
     }
 }
 
@@ -553,7 +563,7 @@ document.addEventListener("mousemove", (event) => {
         return;
     }
     if (beamAttackOrigin.style.display != "none") {
-        updateBeamAttackAngle();
+        updateBeamAttack();
     }
 });
 
