@@ -108,8 +108,8 @@ function updateBeamAttack(): number {
         return 0;
     let element = <HTMLDivElement>document.querySelector(`.placed-card[entityId='${selectedTile.placedCard?.card.entityId}']`);
     let rect = element.getBoundingClientRect();
-    let deltaX = mouseX - rect.x;
-    let deltaY = mouseY - rect.y;
+    let deltaX = mouseX - (rect.x + rect.width / 2.0);
+    let deltaY = mouseY - (rect.y + rect.height / 2.0);
     let angle = Math.atan2(deltaY, deltaX);
 
     let snap = Math.PI / 4.0;
