@@ -16,7 +16,6 @@ let cardInfo = <HTMLDivElement>document.getElementById("card-info");
 let cardInfoTitle = <HTMLElement>document.getElementById("card-info-title");
 let cardInfoHearts = <HTMLElement>document.getElementById("card-info-hearts");
 let cardInfoActions = <HTMLElement>document.getElementById("card-info-actions");
-let beamAttackOrigin = <HTMLElement>document.getElementById("beam-attack-origin");
 
 export let activeClient: Client | undefined = undefined;
 
@@ -101,21 +100,21 @@ function handleReceivedPacket(packet: ServerPacket) {
 
 function hideSelectedActionUI() {
     highlightTiles([]);
-    beamAttackOrigin.style.display = "none";
+    selectedTile.activeBeam = null;
 }
 
 function updateBeamAttack(): number {
-    if (!activeClient || !selectedTile.position)
+    if (!activeClient || !selectedTile.position || !selectedTile.activeBeam)
         return 0;
-    let rect = beamAttackOrigin.getBoundingClientRect();
+    let element = <HTMLDivElement>document.querySelector(`.placed-card[entityId='${selectedTile.placedCard?.card.entityId}']`);
+    let rect = element.getBoundingClientRect();
     let deltaX = mouseX - rect.x;
     let deltaY = mouseY - rect.y;
     let angle = Math.atan2(deltaY, deltaX);
-    beamAttackOrigin.style.rotate = (angle - Math.PI / 2.0) + "rad";
 
     let snap = Math.PI / 4.0;
     angle = Math.round(angle / snap) * snap;
-    let tiles = drawLine(selectedTile.position, angle, parseInt(beamAttackOrigin.style.getPropertyValue("--length")) + 1)
+    let tiles = drawLine(selectedTile.position, angle, selectedTile.activeBeam?.length);
     let highlights: [BoardPosition, TileHighlightColor][] = []
     for (let tile of tiles) {
         highlights.push([tile, TileHighlightColor.Red]);
@@ -125,18 +124,16 @@ function updateBeamAttack(): number {
 }
 
 function showSelectedActionUI(action: CardAction, card: PlacedCard) {
-    if (!activeClient)
+    if (!activeClient || !selectedTile)
         return;
     hideSelectedActionUI();
 
     if (action instanceof TargetedCardAction) {
         highlightTiles(action.highlightsTiles(activeClient.board, card, activeClient.player));
     } else if (action instanceof BeamAttackCardAction) {
-        let element = <HTMLDivElement>document.querySelector(`.placed-card[entityId='${card.card.entityId.toString()}']`);
-        beamAttackOrigin.style.setProperty("--x", element.style.getPropertyValue("--x"));
-        beamAttackOrigin.style.setProperty("--y", element.style.getPropertyValue("--y"));
-        beamAttackOrigin.style.setProperty("--length", action.range.toString());
-        beamAttackOrigin.style.display = "";
+        selectedTile.activeBeam = {
+            length: action.range
+        }
         updateBeamAttack();
     }
 }
@@ -284,6 +281,7 @@ let selectedTile = {
     placedCard: <PlacedCard | null>null,
     position: <BoardPosition | null>null,
     selectedCardAction: <number | null>null,
+    activeBeam: <{ length: number } | null>null,
 };
 function stopSelectingTile() {
     let cardElement = document.querySelector(`.placed-card[entityId='${selectedTile.placedCard?.card.entityId.toString()}']`);
@@ -358,7 +356,12 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     if (placedCard.ownerIndex != activeClient.player.playerIndex) {
         return;
     }
-    selectedTile = { placedCard: placedCard, position: position, selectedCardAction: newSelectedCardAction };
+    selectedTile = {
+        placedCard: placedCard,
+        position: position,
+        selectedCardAction: newSelectedCardAction,
+        activeBeam: null,
+    };
     if (same) {
         selectedTile.selectedCardAction = oldActionIndex;
         console.log("same");
@@ -563,7 +566,7 @@ document.addEventListener("mousemove", (event) => {
         dragMouseMove(event);
         return;
     }
-    if (beamAttackOrigin.style.display != "none") {
+    if (selectedTile.activeBeam) {
         updateBeamAttack();
     }
 });
