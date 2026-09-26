@@ -113,7 +113,8 @@ function updateBeamAttack(): number {
     let angle = Math.atan2(deltaY, deltaX);
     beamAttackOrigin.style.rotate = (angle - Math.PI / 2.0) + "rad";
 
-
+    let snap = Math.PI / 4.0;
+    angle = Math.round(angle / snap) * snap;
     let tiles = drawLine(selectedTile.position, angle, parseInt(beamAttackOrigin.style.getPropertyValue("--length")) + 1)
     let highlights: [BoardPosition, TileHighlightColor][] = []
     for (let tile of tiles) {
