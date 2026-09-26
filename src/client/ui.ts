@@ -117,7 +117,7 @@ function updateBeamAttack(): number {
     let tiles = drawLine(selectedTile.position, angle, selectedTile.activeBeam?.length);
     let highlights: [BoardPosition, TileHighlightColor][] = []
     for (let tile of tiles) {
-        highlights.push([tile, TileHighlightColor.Red]);
+        highlights.push([tile, TileHighlightColor.Fire]);
     }
     highlightTiles(highlights);
     return angle;
@@ -212,6 +212,7 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
 let highlightColorToHueRotate = {
     [TileHighlightColor.Blue]: 0,
     [TileHighlightColor.Red]: 190,
+    [TileHighlightColor.Fire]: 0,
 }
 
 function removeChildren(element: HTMLElement) {
@@ -231,6 +232,10 @@ function highlightTiles(tiles: [BoardPosition, TileHighlightColor][]) {
         element.style.setProperty("--x", tile[0].x.toString());
         element.style.setProperty("--y", tile[0].y.toString());
         element.style.setProperty("--c", highlightColorToHueRotate[tile[1]].toString() + "deg");
+        if (tile[1] == TileHighlightColor.Fire) {
+            element.style.setProperty("--img", `url("assets/fire.png")`);
+            element.style.opacity = "1";
+        }
         tilesHighlight.appendChild(element);
     }
 }

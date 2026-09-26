@@ -6,6 +6,7 @@ import { DamageServerPacket, MoveCardServerPacket } from "./server_packets";
 export enum TileHighlightColor {
     Blue,
     Red,
+    Fire,
 }
 
 export enum CardActionResource {

@@ -279,6 +279,7 @@ body {
     --x: 0;
     --y: 0;
     --c: 0deg;
+    --img: url("assets/target.png");
     z-index: 5;
     position: absolute;
     left: calc(var(--x) * var(--tile-size));
@@ -286,7 +287,7 @@ body {
     width: var(--tile-size);
     height: var(--tile-size);
     pointer-events: none;
-    background-image: url("assets/target.png");
+    background-image: var(--img);
     background-size: cover;
     filter: hue-rotate(var(--c));
     opacity: 0.7;
