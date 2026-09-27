@@ -7,6 +7,7 @@ export enum TileHighlightColor {
     Blue,
     Red,
     Fire,
+    Water,
 }
 
 export enum CardActionResource {
@@ -191,23 +192,31 @@ export class MeleeAttackCardAction extends TargetedCardAction {
     }
 }
 
-export class BeamAttackCardAction extends CardAction {
+export class BeamCardAction extends CardAction {
     /** Angle of beam attack in radians */
     angle: number;
     range: number = 2;
-    color: TileHighlightColor = TileHighlightColor.Red;
+    color: TileHighlightColor = TileHighlightColor.Fire;
     constructor(angle: number) {
         super();
         this.angle = angle;
     }
 }
 
-export class BreathAttackCardAction extends BeamAttackCardAction {
+export class FireBreathCardAction extends BeamCardAction {
     name = "Fire Breath";
     desc = "Fires a concentrated beam of fire.";
     range = 2;
     damage = 3;
-    color = TileHighlightColor.Red;
+    color = TileHighlightColor.Fire;
+}
+
+export class WaterSprayCardAction extends BeamCardAction {
+    name = "Water Spray";
+    desc = "Shoots a concentrated burst of water.";
+    range = 2;
+    damage = 3;
+    color = TileHighlightColor.Water;
 }
 
 /** List of all cardActions. 

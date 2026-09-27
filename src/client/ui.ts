@@ -5,7 +5,7 @@ import { ElementType } from "../elements";
 import { Board, Game, PlacedCard } from "../engine";
 import { Client } from "./client";
 import { CardActionPlayerPacket, PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
-import { BeamAttackCardAction, CardAction, TargetedCardAction, TileHighlightColor } from "../card_actions";
+import { BeamCardAction, CardAction, TargetedCardAction, TileHighlightColor } from "../card_actions";
 import { addHearts } from "../header_row_items";
 
 let gameGrid = document.getElementById("game-grid");
@@ -117,7 +117,7 @@ function updateBeamAttack(): number {
     let tiles = drawLine(selectedTile.position, angle, selectedTile.activeBeam?.length);
     let highlights: [BoardPosition, TileHighlightColor][] = []
     for (let tile of tiles) {
-        highlights.push([tile, TileHighlightColor.Fire]);
+        highlights.push([tile, selectedTile.activeBeam.color]);
     }
     highlightTiles(highlights);
     return angle;
@@ -130,9 +130,10 @@ function showSelectedActionUI(action: CardAction, card: PlacedCard) {
 
     if (action instanceof TargetedCardAction) {
         highlightTiles(action.highlightsTiles(activeClient.board, card, activeClient.player));
-    } else if (action instanceof BeamAttackCardAction) {
+    } else if (action instanceof BeamCardAction) {
         selectedTile.activeBeam = {
-            length: action.range
+            length: action.range,
+            color: action.color,
         }
         updateBeamAttack();
     }
@@ -213,6 +214,7 @@ let highlightColorToHueRotate = {
     [TileHighlightColor.Blue]: 0,
     [TileHighlightColor.Red]: 190,
     [TileHighlightColor.Fire]: 0,
+    [TileHighlightColor.Water]: 0,
 }
 
 function removeChildren(element: HTMLElement) {
@@ -234,6 +236,9 @@ function highlightTiles(tiles: [BoardPosition, TileHighlightColor][]) {
         element.style.setProperty("--c", highlightColorToHueRotate[tile[1]].toString() + "deg");
         if (tile[1] == TileHighlightColor.Fire) {
             element.style.setProperty("--img", `url("assets/fire.png")`);
+            element.style.opacity = "1";
+        } else if (tile[1] == TileHighlightColor.Water) {
+            element.style.setProperty("--img", `url("assets/water.png")`);
             element.style.opacity = "1";
         }
         tilesHighlight.appendChild(element);
@@ -286,7 +291,7 @@ let selectedTile = {
     placedCard: <PlacedCard | null>null,
     position: <BoardPosition | null>null,
     selectedCardAction: <number | null>null,
-    activeBeam: <{ length: number } | null>null,
+    activeBeam: <{ length: number, color: TileHighlightColor } | null>null,
 };
 function stopSelectingTile() {
     let cardElement = document.querySelector(`.placed-card[entityId='${selectedTile.placedCard?.card.entityId.toString()}']`);
