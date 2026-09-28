@@ -317,33 +317,32 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     }
 
     if (selectedTile.placedCard) {
-        let pressedAction: CardAction | null = null;
         if (selectedTile.selectedCardAction != null) {
+            let pressedAction = false;
             let action = selectedTile.placedCard.card.actions[selectedTile.selectedCardAction];
-            if (action) {
-                let actionInstance = <CardAction>(new (<any>action).constructor());
+            if (action instanceof TargetedCardAction) {
+                let actionInstance = <TargetedCardAction>(new (<any>action).constructor());
                 if (actionInstance.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
                     let tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
                     for (let tile of tiles) {
                         if (tile[0].equals(position)) {
-                            pressedAction = action;
+                            pressedAction = true;
+                            break;
                         }
                     }
                 }
+                if (pressedAction) {
+                    actionInstance = new (<any>action).constructor(position);
+                    selectedTile.selectedCardAction = null;
+                    sendPlayerPacket(new CardActionPlayerPacket(
+                        selectedTile.placedCard.card.entityId,
+                        actionInstance
+                    ));
+                    let placedCard = activeClient.board.findCardOnBoard(selectedTile.placedCard).placedCard;
+                    displayCardInfo(placedCard);
+                    return;
+                }
             }
-        }
-        if (pressedAction) {
-            if (pressedAction instanceof TargetedCardAction) {
-                let instance = new (<any>pressedAction).constructor(position);
-                selectedTile.selectedCardAction = null;
-                sendPlayerPacket(new CardActionPlayerPacket(
-                    selectedTile.placedCard.card.entityId,
-                    instance
-                ));
-            }
-            let placedCard = activeClient.board.findCardOnBoard(selectedTile.placedCard).placedCard;
-            displayCardInfo(placedCard);
-            return;
         }
     }
 
@@ -380,8 +379,11 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
     if (selectedTile.selectedCardAction != null) {
         let action = <CardAction>placedCard.card.actions[selectedTile.selectedCardAction];
         let actionInstance = <CardAction>(new (<any>action).constructor());
-        if (actionInstance.available(activeClient.board, placedCard, activeClient.player)) {
-            highlightTiles(action.highlightsTiles(activeClient.board, placedCard, activeClient.player))
+
+        if (action instanceof TargetedCardAction) {
+            if (actionInstance.available(activeClient.board, placedCard, activeClient.player)) {
+                highlightTiles(action.highlightsTiles(activeClient.board, placedCard, activeClient.player))
+            }
         }
     }
 

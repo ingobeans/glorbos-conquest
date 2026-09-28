@@ -63,15 +63,6 @@ export class CardAction {
         return true;
     }
 
-    /** 
-     * Runs clientside for the frontend. 
-     * Should return tiles that should be highlighted when this action is previewed.
-     * Returns a list of tile indexes with the color for the highlight in hex.
-    */
-    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
-        return [];
-    }
-
     useResources(game: Game, tile: Tile, card: PlacedCard, player: Player) {
         for (let resource of this.usesResources) {
             card.card.roundData.resources[resource]--;
@@ -87,6 +78,15 @@ export class TargetedCardAction extends CardAction {
     constructor(target: BoardPosition) {
         super();
         this.target = target;
+    }
+
+    /** 
+     * Runs clientside for the frontend. 
+     * Should return tiles that should be highlighted when this action is previewed.
+     * Returns a list of positions and the color
+    */
+    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
+        return [];
     }
 }
 
