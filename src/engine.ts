@@ -156,8 +156,7 @@ export class Board {
     }
     anyActionAvailable(placedCard: PlacedCard, player: Player): boolean {
         for (let action of placedCard.card.actions) {
-            let actionInstance = new (<any>action).constructor();
-            if (actionInstance.available(this, placedCard, player)) {
+            if (action.available(this, placedCard, player)) {
                 return true;
             }
         }
@@ -269,9 +268,7 @@ export class Game {
 
             let found = false;
             for (let action of placedCard.card.actions) {
-                let actionInstance = new (<any>action).constructor();
-
-                if (actionInstance.name == cardAction.name) {
+                if (action.name == cardAction.name) {
                     found = true;
                 }
             }

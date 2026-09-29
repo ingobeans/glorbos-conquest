@@ -151,8 +151,7 @@ function clickCardInfoAction(element: HTMLDivElement, index: number) {
     selectedTile.selectedCardAction = index;
 
     let card = <PlacedCard>selectedTile.placedCard;
-    let actionInstance = new (<any>card.card.actions[index]).constructor();
-    showSelectedActionUI(actionInstance, card)
+    showSelectedActionUI(<CardAction>card.card.actions[index], card)
 }
 
 function displayCardInfo(card: PlacedCard | number | undefined) {
@@ -172,14 +171,13 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
 
     cardInfoActions.innerHTML = "";
     for (let [index, action] of card.card.actions.entries()) {
-        let actionInstance = new (<any>action).constructor();
         let container = document.createElement("div");
         container.classList.add("card-info-action-container");
 
         let headerRow = document.createElement("div");
         headerRow.classList.add("card-info-action-header-row");
 
-        let unavailable = card.ownerIndex != activeClient.player.playerIndex || !actionInstance.available(activeClient.board, card, activeClient.player);
+        let unavailable = card.ownerIndex != activeClient.player.playerIndex || !action.available(activeClient.board, card, activeClient.player);
         if (unavailable) {
             container.classList.add("card-info-action-container-unavailable");
         } else {
@@ -190,16 +188,16 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
         }
 
         let name = document.createElement("span");
-        name.innerText = actionInstance.name;
+        name.innerText = action.name;
         name.classList.add("card-info-action-name");
         headerRow.appendChild(name);
 
-        for (let item of actionInstance.getHeaderRowItems()) {
+        for (let item of action.getHeaderRowItems(card)) {
             headerRow.appendChild(item.generateElement(card));
         }
 
         let desc = document.createElement("span");
-        desc.innerText = actionInstance.desc;
+        desc.innerText = action.desc;
         name.classList.add("card-info-action-desc");
 
         container.appendChild(headerRow);
@@ -321,8 +319,7 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
             let pressedAction = false;
             let action = selectedTile.placedCard.card.actions[selectedTile.selectedCardAction];
             if (action instanceof TargetedCardAction) {
-                let actionInstance = <TargetedCardAction>(new (<any>action).constructor());
-                if (actionInstance.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
+                if (action.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
                     let tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
                     for (let tile of tiles) {
                         if (tile[0].equals(position)) {
@@ -332,11 +329,11 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
                     }
                 }
                 if (pressedAction) {
-                    actionInstance = new (<any>action).constructor(position);
+                    action = action.new(position);
                     selectedTile.selectedCardAction = null;
                     sendPlayerPacket(new CardActionPlayerPacket(
                         selectedTile.placedCard.card.entityId,
-                        actionInstance
+                        <CardAction>action
                     ));
                     let placedCard = activeClient.board.findCardOnBoard(selectedTile.placedCard).placedCard;
                     displayCardInfo(placedCard);
@@ -378,10 +375,8 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
 
     if (selectedTile.selectedCardAction != null) {
         let action = <CardAction>placedCard.card.actions[selectedTile.selectedCardAction];
-        let actionInstance = <CardAction>(new (<any>action).constructor());
-
         if (action instanceof TargetedCardAction) {
-            if (actionInstance.available(activeClient.board, placedCard, activeClient.player)) {
+            if (action.available(activeClient.board, placedCard, activeClient.player)) {
                 highlightTiles(action.highlightsTiles(activeClient.board, placedCard, activeClient.player))
             }
         }
