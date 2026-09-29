@@ -148,7 +148,11 @@ export class MeleeAttackCardAction extends TargetedCardAction {
     name = "Melee Attack";
     desc = "Attack an adjacent tile";
     usesResources = [CardActionResource.Attack];
-    damage = 1;
+    damage: number;
+    constructor(damage: number) {
+        super();
+        this.damage = damage;
+    }
 
     availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
         let highlightedTiles = this.highlightsTiles(board, card, player);
@@ -204,7 +208,7 @@ export class MeleeAttackCardAction extends TargetedCardAction {
         game.sendPackets(packets);
     }
 }
-export let meleeAttackCardAction = new MeleeAttackCardAction();
+export let meleeAttackCardAction = new MeleeAttackCardAction(1);
 
 export class BeamCardAction extends CardAction {
     /** Angle of beam attack in radians */
