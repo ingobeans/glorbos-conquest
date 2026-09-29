@@ -1,4 +1,4 @@
-import { CardAction, FireBreathCardAction, MoveCardAction, WaterSprayCardAction } from "../card_actions";
+import { CardAction, fireBreathCardAction, moveCardAction, waterSprayCardAction } from "../card_actions";
 import { Card, registerCard } from "../cards";
 import { ElementType } from "../elements";
 
@@ -6,13 +6,13 @@ class Dragon extends Card {
     name = "Dragon";
     elementTypes = [ElementType.Fire, ElementType.Dark];
     maxHealth = 8;
-    actions: CardAction[] = [MoveCardAction.prototype];
+    actions: CardAction[] = [moveCardAction];
 }
 
 export function register() {
     let types: [ElementType, string, CardAction][] = [
-        [ElementType.Fire, "Red", FireBreathCardAction.prototype],
-        [ElementType.Water, "Water", WaterSprayCardAction.prototype],
+        [ElementType.Fire, "Red", fireBreathCardAction],
+        [ElementType.Water, "Water", waterSprayCardAction],
     ];
     for (let type of types) {
         let card = new Dragon();

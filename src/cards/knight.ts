@@ -1,4 +1,4 @@
-import { CardAction, MeleeAttackCardAction, MoveCardAction } from "../card_actions";
+import { CardAction, meleeAttackCardAction, moveCardAction } from "../card_actions";
 import { Card, registerCard } from "../cards";
 import { ElementType } from "../elements";
 import { PlacedCard } from "../engine";
@@ -10,8 +10,8 @@ class Knight extends Card {
     elementTypes = [ElementType.Light];
     maxHealth = 6;
     actions = [
-        MoveCardAction.prototype,
-        MeleeAttackCardAction.prototype
+        moveCardAction,
+        meleeAttackCardAction
     ];
 }
 

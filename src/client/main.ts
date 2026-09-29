@@ -1,4 +1,3 @@
-import { MoveCardAction } from "../card_actions";
 import { Card, cardRegistry } from "../cards";
 import { Game, PlacedCard, Player } from "../engine";
 import { PlayerPacket, playerPacketsRegistry } from "../player_packets";

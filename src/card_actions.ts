@@ -1,7 +1,9 @@
 import { BoardPosition } from "./board";
+import { ElementType } from "./elements";
 import { Board, Game, PlacedCard, Player, Tile } from "./engine";
 import { ActionHeaderRowItem, HeartHeaderRowItem } from "./header_row_items";
 import { DamageServerPacket, MoveCardServerPacket } from "./server_packets";
+import { clone } from "./utils";
 
 export enum TileHighlightColor {
     Blue,
@@ -15,7 +17,6 @@ export enum CardActionResource {
     Attack,
 }
 
-
 export class CardAction {
     name: string = "unknown";
     icon: string = "placeholder";
@@ -28,6 +29,15 @@ export class CardAction {
             items.push(new HeartHeaderRowItem(this.damage));
         }
         return items;
+    }
+
+
+    /**  
+     * Constructs a new instance of the card action.
+     * Specialized by every card action that needs custom constructors.
+    */
+    new(..._: any): this {
+        return clone(this);
     }
 
     /**  
@@ -74,10 +84,12 @@ export class CardAction {
 }
 
 export class TargetedCardAction extends CardAction {
-    target: BoardPosition;
-    constructor(target: BoardPosition) {
-        super();
-        this.target = target;
+    target: BoardPosition = <any>null;
+
+    new(target: BoardPosition): this {
+        let a = super.new();
+        a.target = target;
+        return a;
     }
 
     /** 
@@ -90,7 +102,7 @@ export class TargetedCardAction extends CardAction {
     }
 }
 
-export class MoveCardAction extends TargetedCardAction {
+class MoveCardAction extends TargetedCardAction {
     name = "Move";
     desc = "Move one tile in any direction";
     usesResources = [CardActionResource.Movement];
@@ -130,6 +142,7 @@ export class MoveCardAction extends TargetedCardAction {
         game.sendPackets([new MoveCardServerPacket(card.card.entityId, this.target)]);
     }
 }
+export let moveCardAction = new MoveCardAction();
 
 export class MeleeAttackCardAction extends TargetedCardAction {
     name = "Melee Attack";
@@ -191,33 +204,50 @@ export class MeleeAttackCardAction extends TargetedCardAction {
         game.sendPackets(packets);
     }
 }
+export let meleeAttackCardAction = new MeleeAttackCardAction();
 
 export class BeamCardAction extends CardAction {
     /** Angle of beam attack in radians */
-    angle: number;
+    angle: number = 0;
     range: number = 2;
     color: TileHighlightColor = TileHighlightColor.Fire;
-    constructor(angle: number) {
-        super();
-        this.angle = angle;
+
+    new(angle: number): this {
+        let a = super.new();
+        a.angle = angle;
+        return a;
     }
 }
 
-export class FireBreathCardAction extends BeamCardAction {
+export class BreathAttackCardAction extends BeamCardAction {
     name = "Fire Breath";
     desc = "Fires a concentrated beam of fire.";
     range = 2;
     damage = 3;
-    color = TileHighlightColor.Fire;
+    color = <any>null;
+    element: ElementType = <any>null;
+    constructor(name: string, desc: string, element: ElementType, color: TileHighlightColor) {
+        super();
+        this.name = name;
+        this.desc = desc;
+        this.color = color;
+        this.element = element;
+    }
 }
 
-export class WaterSprayCardAction extends BeamCardAction {
-    name = "Water Spray";
-    desc = "Shoots a concentrated burst of water.";
-    range = 2;
-    damage = 3;
-    color = TileHighlightColor.Water;
-}
+export let fireBreathCardAction = new BreathAttackCardAction(
+    "Fire Breath",
+    "Fires a concentrated beam of fire.",
+    ElementType.Fire,
+    TileHighlightColor.Fire
+);
+export let waterSprayCardAction = new BreathAttackCardAction(
+    "Water Spray",
+    "Shoots a concentrated burst of water.",
+    ElementType.Water,
+    TileHighlightColor.Water
+);
+
 
 /** List of all cardActions. 
  * Every card action class must be listed here to be valid.
