@@ -279,7 +279,7 @@ body {
     --x: 0;
     --y: 0;
     --c: 0deg;
-    --img: url("assets/target.png");
+    --img: url("assets/tile-highlights/target.png");
     z-index: 5;
     position: absolute;
     left: calc(var(--x) * var(--tile-size));

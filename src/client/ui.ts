@@ -208,11 +208,22 @@ function displayCardInfo(card: PlacedCard | number | undefined) {
     cardInfo.style.display = "";
 }
 
-let highlightColorToHueRotate = {
-    [TileHighlightColor.Blue]: 0,
-    [TileHighlightColor.Red]: 190,
-    [TileHighlightColor.Fire]: 0,
-    [TileHighlightColor.Water]: 0,
+let highlightColorTable: { [key in TileHighlightColor]: {
+    hueShift?: number,
+    opacity?: number,
+    img?: string,
+} } = {
+    [TileHighlightColor.BlueTarget]: {
+        hueShift: 0
+    },
+    [TileHighlightColor.RedTarget]: {
+        hueShift: 190
+    },
+    [TileHighlightColor.RedSelect]: {
+        hueShift: 0,
+        opacity: 1,
+        img: "tile-select",
+    },
 }
 
 function removeChildren(element: HTMLElement) {
@@ -231,14 +242,14 @@ function highlightTiles(tiles: [BoardPosition, TileHighlightColor][]) {
         element.className = "highlight-tile";
         element.style.setProperty("--x", tile[0].x.toString());
         element.style.setProperty("--y", tile[0].y.toString());
-        element.style.setProperty("--c", highlightColorToHueRotate[tile[1]].toString() + "deg");
-        if (tile[1] == TileHighlightColor.Fire) {
-            element.style.setProperty("--img", `url("assets/fire.png")`);
-            element.style.opacity = "1";
-        } else if (tile[1] == TileHighlightColor.Water) {
-            element.style.setProperty("--img", `url("assets/water.png")`);
-            element.style.opacity = "1";
-        }
+        let color = highlightColorTable[tile[1]];
+        if (color.hueShift)
+            element.style.setProperty("--c", color.hueShift.toString() + "deg");
+        if (color.img)
+            element.style.setProperty("--img", `url("assets/tile-highlights/${color.img}.png")`);
+        if (color.opacity)
+            element.style.opacity = color.opacity.toString();
+
         tilesHighlight.appendChild(element);
     }
 }

@@ -6,10 +6,9 @@ import { DamageServerPacket, MoveCardServerPacket } from "./server_packets";
 import { clone } from "./utils";
 
 export enum TileHighlightColor {
-    Blue,
-    Red,
-    Fire,
-    Water,
+    BlueTarget,
+    RedTarget,
+    RedSelect,
 }
 
 export enum CardActionResource {
@@ -130,7 +129,7 @@ class MoveCardAction extends TargetedCardAction {
             if (!board.canPlaceAt(card, newPos)) {
                 continue;
             }
-            tiles.push([newPos, TileHighlightColor.Blue]);
+            tiles.push([newPos, TileHighlightColor.BlueTarget]);
         }
 
         return tiles;
@@ -182,7 +181,7 @@ export class MeleeAttackCardAction extends TargetedCardAction {
             }
             let card = board.getTileAt(newPos).tryBorrowLast();
             if (card && card.ownerIndex != player.playerIndex) {
-                tiles.push([newPos, TileHighlightColor.Red]);
+                tiles.push([newPos, TileHighlightColor.RedTarget]);
             }
 
         }
@@ -214,7 +213,7 @@ export class BeamCardAction extends CardAction {
     /** Angle of beam attack in radians */
     angle: number = 0;
     range: number = 2;
-    color: TileHighlightColor = TileHighlightColor.Fire;
+    color: TileHighlightColor = TileHighlightColor.RedSelect;
 
     new(angle: number): this {
         let a = super.new();
@@ -243,13 +242,13 @@ export let fireBreathCardAction = new BreathAttackCardAction(
     "Fire Breath",
     "Fires a concentrated beam of fire.",
     ElementType.Fire,
-    TileHighlightColor.Fire
+    TileHighlightColor.RedSelect
 );
 export let waterSprayCardAction = new BreathAttackCardAction(
     "Water Spray",
     "Shoots a concentrated burst of water.",
     ElementType.Water,
-    TileHighlightColor.Water
+    TileHighlightColor.RedSelect
 );
 
 
