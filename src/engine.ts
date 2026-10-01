@@ -141,7 +141,7 @@ export class Tile {
     borrowLast(): PlacedCard {
         let l = this.tryBorrowLast();
         if (l == undefined)
-            throw Error("Tile.getLast() failed because tile has no cards");
+            throw Error("Tile.borrowLast() failed because tile has no cards");
         return l;
     }
 }
