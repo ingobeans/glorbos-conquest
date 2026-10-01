@@ -144,6 +144,53 @@ class MoveCardAction extends TargetedCardAction {
 }
 export let moveCardAction = new MoveCardAction();
 
+class LeapCardAction extends TargetedCardAction {
+    name = "Leap";
+    desc = "Move in an L";
+    // usesResources = [CardActionResource.Movement];
+    availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
+        let highlightedTiles = this.highlightsTiles(board, card, player);
+        if (highlightedTiles.length == 0)
+            return false;
+
+        return true;
+    }
+    valid(board: Board, card: PlacedCard, player: Player): boolean {
+        let position = board.positionOf(card);
+        let delta = position.subtract(this.target).abs();
+        return (delta.x == 1 || delta.y == 1);
+    }
+    highlightsTiles(board: Board, card: PlacedCard, player: Player): [BoardPosition, TileHighlightColor][] {
+        let tiles: [BoardPosition, TileHighlightColor][] = [];
+        let directions: [number, number][] = [[2, 1], [2, -1], [-2, 1], [-2, -1]];
+        let position = board.positionOf(card);
+        for (let flip of [false,true]) {
+            for (let direction of directions) {
+                if (flip) {
+                    direction = [direction[1],direction[0]];
+                }
+                let newPos = position.add(direction);
+                if (newPos.isOutsideBoard(board)) {
+                    continue;
+                }
+                if (!board.canPlaceAt(card, newPos)) {
+                    continue;
+                }
+                tiles.push([newPos, TileHighlightColor.BlueTarget]);
+            }
+        }
+        return tiles;
+    }
+    use(game: Game, tile: Tile, card: PlacedCard, player: Player): void {
+        let taken = tile.takeLast();
+        let targetTile = game.board.getTileAt(this.target);
+        targetTile.cards.push(taken);
+        game.sendPackets([new MoveCardServerPacket(card.card.entityId, this.target)]);
+    }
+}
+export let leapCardAction = new LeapCardAction();
+
+
 export class MeleeAttackCardAction extends TargetedCardAction {
     name = "Melee Attack";
     desc = "Attack an adjacent tile";
@@ -287,5 +334,6 @@ export let cardActionsRegistry = [
     MoveCardAction.prototype,
     MeleeAttackCardAction.prototype,
     BreathAttackCardAction.prototype,
+    LeapCardAction.prototype,
 ];
 console.log(cardActionsRegistry);
