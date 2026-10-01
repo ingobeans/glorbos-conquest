@@ -1,4 +1,4 @@
-import { BoardPosition } from "./board";
+import { BoardPosition, drawLine } from "./board";
 import { ElementType } from "./elements";
 import { Board, Game, PlacedCard, Player, Tile } from "./engine";
 import { ActionHeaderRowItem, HeartHeaderRowItem } from "./header_row_items";
@@ -239,6 +239,23 @@ export class BreathAttackCardAction extends BeamCardAction {
         this.desc = desc;
         this.color = color;
         this.element = element;
+    }
+    use(game: Game, tile: Tile, card: PlacedCard, player: Player): void {
+        let tiles = drawLine(game.board.positionOf(card),this.angle,this.range,false);
+        let packets = [];
+        for (let position of tiles) {
+            let particle = new FireParticle(position);
+            packets.push(new ShowParticleServerPacket(particle));
+
+            let targetTile = game.board.getTileAt(position);
+
+            let victim = targetTile.tryBorrowLast();
+            if (!victim)
+                continue
+
+            packets.push(new DamageServerPacket(card.card.entityId, victim.card.entityId, this.damage));
+        }
+        game.sendPackets(packets);
     }
 }
 
