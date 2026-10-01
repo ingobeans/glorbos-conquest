@@ -295,7 +295,7 @@ export class BreathAttackCardAction extends BeamCardAction {
         this.element = element;
     }
     use(game: Game, tile: Tile, card: PlacedCard, player: Player): void {
-        let tiles = drawLine(game.board.positionOf(card),this.angle,this.range,false);
+        let tiles = drawLine(game.board.positionOf(card),this.angle,this.range,false,game.board.size);
         let packets = [];
         for (let position of tiles) {
             let particle = new FireParticle(position);

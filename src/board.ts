@@ -75,7 +75,7 @@ function parseBoardPosititionLike(v: BoardPositionLike): BoardPosition {
 }
 export type BoardPositionLike = [number, number] | BoardPosition | { x: number, y: number } | number;
 
-export function drawLine(from: BoardPositionLike, angle: number, maxLength: number, includeSelf: boolean = false) {
+export function drawLine(from: BoardPositionLike, angle: number, maxLength: number, includeSelf: boolean = false, excludeOutOfBounds:number|undefined = undefined) {
     let fromParsed = parseBoardPosititionLike(from);
     const stepSize = 0.2;
     let stepX = Math.cos(angle) * stepSize;
@@ -84,10 +84,16 @@ export function drawLine(from: BoardPositionLike, angle: number, maxLength: numb
     let tiles: BoardPosition[] = [];
     while (true) {
         let currentTile = pos.floor();
+        if (excludeOutOfBounds !== undefined) {
+            if (currentTile.x < 0 || currentTile.y < 0 || 
+                currentTile.x >= excludeOutOfBounds || currentTile.y >= excludeOutOfBounds) {
+                return tiles;
+            }
+            
+        }
         if (arrayIndexOf(tiles, currentTile) == -1 && (includeSelf || !currentTile.equals(fromParsed))) {
             tiles.push(currentTile);
             if (tiles.length >= maxLength) {
-
                 return tiles;
             }
         }
