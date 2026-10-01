@@ -8,7 +8,7 @@ import { CardActionPlayerPacket, PlaceCardPlayerPacket, PlayerPacket } from "../
 import { BeamCardAction, CardAction, TargetedCardAction, TileHighlightColor } from "../card_actions";
 import { addHearts } from "../header_row_items";
 import { decodePacket } from "../utils";
-import { particlesRegistry } from "../particles";
+import { Particle, particlesRegistry } from "../particles";
 
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
@@ -99,11 +99,30 @@ function handleReceivedPacket(packet: ServerPacket) {
     else if (packet instanceof ShowParticleServerPacket) {
         let particle = decodePacket(packet.payload, particlesRegistry);
         let e = particle.createElement();
+        loadedParticles.push(particle);
         particlesContainer?.appendChild(e);
     }
     else {
         console.warn("Unhandled packet");
     }
+}
+
+let loadedParticles: Particle[] = [];
+
+let lastAnimationFrame = 0.0;
+function updateParticles(time: number) {
+    let deltaTime = time - lastAnimationFrame;
+    lastAnimationFrame = time;
+
+    for (var i = loadedParticles.length - 1; i >= 0; i--) {
+        let particle = loadedParticles[i];
+        if (particle?.update(deltaTime) == true || particle?.activeElement == null || !particle.activeElement.isConnected) {
+            particle?.activeElement?.remove();
+            loadedParticles.splice(i, 1);
+        }
+    }
+
+    requestAnimationFrame(updateParticles);
 }
 
 function hideSelectedActionUI() {
@@ -615,3 +634,5 @@ export function loadUi(client: Client): (packet: ServerPacket) => void {
     createPlayerHandElements(client.player.deck);
     return handleReceivedPacket;
 }
+
+updateParticles(0);
