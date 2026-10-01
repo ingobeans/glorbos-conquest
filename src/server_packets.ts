@@ -74,6 +74,7 @@ export let serverPacketRegistry = [
     MoveCardServerPacket.prototype,
     UpdateCardRoundDataServerPacket.prototype,
     DamageServerPacket.prototype,
+    ShowParticleServerPacket.prototype,
 ];
 
 // used to get the unioned type of server packets

@@ -33,6 +33,7 @@ function sendServerPacket(packets: ServerPacket[], playerIndex: number) {
         client.receivePacket(packetDecoded);
         handleReceivedPacket(packetDecoded);
     }
+    console.log(packets);
 
     packets.forEach(handlePacket);
 }

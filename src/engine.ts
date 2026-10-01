@@ -1,11 +1,12 @@
 import { populate } from "./registry";
 import { Card, cardRegistry, CardRoundData } from "./cards"
 import { SpellCard, spellCardRegistry } from "./spellcards"
-import { PlaceCardServerPacket, ErrorServerPacket, ServerPacket, UpdateCardRoundDataServerPacket, } from "./server_packets";
+import { PlaceCardServerPacket, ErrorServerPacket, ServerPacket, UpdateCardRoundDataServerPacket, ShowParticleServerPacket, } from "./server_packets";
 import { BoardPosition } from "./board";
 import { clone, decodePacket } from "./utils";
 import { CardAction, cardActionsRegistry, TileHighlightColor } from "./card_actions";
 import { CardActionPlayerPacket, PlaceCardPlayerPacket, PlayerPacket, StatePlayerPacket, StatePlayerPacketType } from "./player_packets";
+import { FireParticle } from "./particles";
 
 populate();
 
@@ -305,7 +306,10 @@ export class Game {
             player.removeCard(packet.cardEntityId);
             this.board.placeCardAt(placed, packet.position);
             let serverPacket = new PlaceCardServerPacket(card, packet.position);
-            this.sendPackets([serverPacket]);
+            let packets: ServerPacket[] = [serverPacket];
+            let particle = new FireParticle(packet.position);
+            packets.push(new ShowParticleServerPacket(particle));
+            this.sendPackets(packets);
             return;
         }
         else if (packet instanceof StatePlayerPacket) {

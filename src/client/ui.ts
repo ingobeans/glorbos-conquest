@@ -1,4 +1,4 @@
-import { DamageServerPacket, MoveCardServerPacket, PlaceCardServerPacket, ServerPacket, UpdateCardRoundDataServerPacket } from "../server_packets";
+import { DamageServerPacket, MoveCardServerPacket, PlaceCardServerPacket, ServerPacket, ShowParticleServerPacket, UpdateCardRoundDataServerPacket } from "../server_packets";
 import { BoardPosition, drawLine } from "../board";
 import { Card } from "../cards";
 import { ElementType } from "../elements";
@@ -7,10 +7,13 @@ import { Client } from "./client";
 import { CardActionPlayerPacket, PlaceCardPlayerPacket, PlayerPacket } from "../player_packets";
 import { BeamCardAction, CardAction, TargetedCardAction, TileHighlightColor } from "../card_actions";
 import { addHearts } from "../header_row_items";
+import { decodePacket } from "../utils";
+import { particlesRegistry } from "../particles";
 
 let gameGrid = document.getElementById("game-grid");
 let playerDeck = document.getElementById("player-deck");
 let tilesHighlight = document.getElementById("tiles-highlight");
+let particlesContainer = document.getElementById("particles-container");
 let placedCardsContainer = document.getElementById("placed-cards");
 let cardInfo = <HTMLDivElement>document.getElementById("card-info");
 let cardInfoTitle = <HTMLElement>document.getElementById("card-info-title");
@@ -92,6 +95,11 @@ function handleReceivedPacket(packet: ServerPacket) {
             element.style.setProperty("--offset-y", null);
             element.style.setProperty("transition", null);
         }, 120)
+    }
+    else if (packet instanceof ShowParticleServerPacket) {
+        let particle = decodePacket(packet.payload, particlesRegistry);
+        let e = particle.createElement();
+        particlesContainer?.appendChild(e);
     }
     else {
         console.warn("Unhandled packet");

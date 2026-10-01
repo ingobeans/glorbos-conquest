@@ -1,8 +1,15 @@
 import { BoardPosition } from "./board";
 
 export class Particle {
+    baseElement: string = "div";
     position: BoardPosition;
     life: number = 0.0;
+    createElement(): HTMLElement {
+        let element = document.createElement(this.baseElement);
+        element.style.setProperty("--x", this.position.x.toString());
+        element.style.setProperty("--y", this.position.y.toString());
+        return element;
+    }
     constructor(position: BoardPosition) {
         this.position = position;
     }
@@ -10,23 +17,10 @@ export class Particle {
         this.life += deltaTime;
     }
 }
-export class ElementParticle extends Particle {
-    element: HTMLElement;
-    life: number = 0.0;
-    createElement(): HTMLElement {
-        return document.createElement("div");
-    }
-    constructor(position: BoardPosition) {
-        super(position);
-        this.element = this.createElement();
-        this.element.style.setProperty("--x", position.x.toString());
-        this.element.style.setProperty("--y", position.y.toString());
-    }
-}
 
-export class FireParticle extends ElementParticle {
+export class FireParticle extends Particle {
     createElement(): HTMLElement {
-        let e = document.createElement("div");
+        let e = super.createElement();
         e.classList.add("highlight-tile");
         e.style.setProperty("--img", `url("assets/particles/fire.gif")`);
         e.style.opacity = "1";
