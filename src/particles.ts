@@ -26,7 +26,8 @@ export class Particle {
 }
 
 export class FireParticle extends Particle {
-    maxLife: number = 100000.0;
+    /** Gif doesn't loop so this doesn't have to be the exact length of the gif */
+    maxLife: number = 1000.0;
     customCreateElement(): HTMLElement {
         let e = super.customCreateElement();
         e.classList.add("highlight-tile");
