@@ -139,8 +139,7 @@ function updateBeamAttack(): number {
     let deltaY = mouseY - (rect.y + rect.height / 2.0);
     let angle = Math.atan2(deltaY, deltaX);
 
-    let snap = Math.PI / 4.0;
-    angle = Math.round(angle / snap) * snap;
+    angle = BeamCardAction.snapAngle(angle);
     selectedTile.activeBeam.angle = angle;
     let tiles = drawLine(selectedTile.position, angle, selectedTile.activeBeam?.length);
     let highlights: [BoardPosition, TileHighlightColor][] = []

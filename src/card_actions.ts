@@ -268,9 +268,13 @@ export class BeamCardAction extends CardAction {
         a.angle = angle;
         return a;
     }
-    valid(board: Board, card: PlacedCard, player: Player): boolean {
+    static snapAngle(angle:number):number {
         let snap = Math.PI / 4.0;
-        this.angle = Math.round(this.angle / snap) * snap;
+        angle = Math.round(angle / snap) * snap;
+        return angle
+    }
+    valid(board: Board, card: PlacedCard, player: Player): boolean {
+        this.angle = BeamCardAction.snapAngle(this.angle);
         return true;
     }
 }
