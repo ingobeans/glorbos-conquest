@@ -306,10 +306,7 @@ export class Game {
             player.removeCard(packet.cardEntityId);
             this.board.placeCardAt(placed, packet.position);
             let serverPacket = new PlaceCardServerPacket(card, packet.position);
-            let packets: ServerPacket[] = [serverPacket];
-            let particle = new FireParticle(packet.position);
-            packets.push(new ShowParticleServerPacket(particle));
-            this.sendPackets(packets);
+            this.sendPackets([serverPacket]);
             return;
         }
         else if (packet instanceof StatePlayerPacket) {
