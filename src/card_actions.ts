@@ -303,6 +303,7 @@ export class BreathAttackCardAction extends BeamCardAction {
             if (!victim)
                 continue
 
+            victim.card.damage(this.damage);
             packets.push(new DamageServerPacket(card.card.entityId, victim.card.entityId, this.damage));
         }
         game.sendPackets(packets);
