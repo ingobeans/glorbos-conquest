@@ -205,8 +205,6 @@ export class MeleeAttackCardAction extends TargetedCardAction {
             packets.push(new MoveCardServerPacket(card.card.entityId, this.target));
         }
         packets.push(new DamageServerPacket(card.card.entityId, victim.card.entityId, this.damage));
-        let particle = new FireParticle(this.target);
-        packets.push(new ShowParticleServerPacket(particle));
         game.sendPackets(packets);
     }
 }
