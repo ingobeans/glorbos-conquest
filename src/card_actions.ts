@@ -228,6 +228,7 @@ export class BeamCardAction extends CardAction {
 export class BreathAttackCardAction extends BeamCardAction {
     name = "Fire Breath";
     desc = "Fires a concentrated beam of fire.";
+    usesResources = [CardActionResource.Attack];
     range = 2;
     damage = 3;
     color = <any>null;
@@ -264,6 +265,7 @@ export let waterSprayCardAction = new BreathAttackCardAction(
 */
 export let cardActionsRegistry = [
     MoveCardAction.prototype,
-    MeleeAttackCardAction.prototype
+    MeleeAttackCardAction.prototype,
+    BreathAttackCardAction.prototype,
 ];
 console.log(cardActionsRegistry);

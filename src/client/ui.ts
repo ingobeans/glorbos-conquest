@@ -141,11 +141,13 @@ function updateBeamAttack(): number {
 
     let snap = Math.PI / 4.0;
     angle = Math.round(angle / snap) * snap;
+    selectedTile.activeBeam.angle = angle;
     let tiles = drawLine(selectedTile.position, angle, selectedTile.activeBeam?.length);
     let highlights: [BoardPosition, TileHighlightColor][] = []
     for (let tile of tiles) {
         highlights.push([tile, selectedTile.activeBeam.color]);
     }
+    selectedTile.activeBeam.highlighted = highlights;
     highlightTiles(highlights);
     return angle;
 }
@@ -161,6 +163,8 @@ function showSelectedActionUI(action: CardAction, card: PlacedCard) {
         selectedTile.activeBeam = {
             length: action.range,
             color: action.color,
+            highlighted: [],
+            angle: 0.0,
         }
         updateBeamAttack();
     }
@@ -327,7 +331,12 @@ let selectedTile = {
     placedCard: <PlacedCard | null>null,
     position: <BoardPosition | null>null,
     selectedCardAction: <number | null>null,
-    activeBeam: <{ length: number, color: TileHighlightColor } | null>null,
+    activeBeam: <{ 
+        length: number, 
+        color: TileHighlightColor, 
+        highlighted: [BoardPosition, TileHighlightColor][],
+        angle: number
+    } | null>null,
 };
 function stopSelectingTile() {
     let cardElement = document.querySelector(`.placed-card[entityId='${selectedTile.placedCard?.card.entityId.toString()}']`);
@@ -356,9 +365,16 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
         if (selectedTile.selectedCardAction != null) {
             let pressedAction = false;
             let action = selectedTile.placedCard.card.actions[selectedTile.selectedCardAction];
-            if (action instanceof TargetedCardAction) {
+            if (action instanceof TargetedCardAction || action instanceof BeamCardAction) {
                 if (action.available(activeClient.board, selectedTile.placedCard, activeClient.player)) {
-                    let tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
+                    let tiles;
+                    if (action instanceof TargetedCardAction ) {
+                        tiles = action.highlightsTiles(activeClient.board, selectedTile.placedCard, activeClient.player);
+                    } else if (selectedTile.activeBeam) {
+                        tiles = selectedTile.activeBeam.highlighted;
+                    } else {
+                        throw Error();
+                    }
                     for (let tile of tiles) {
                         if (tile[0].equals(position)) {
                             pressedAction = true;
@@ -367,7 +383,11 @@ function clickTile(element: HTMLDivElement | BoardPosition) {
                     }
                 }
                 if (pressedAction) {
-                    action = action.new(position);
+                    if (action instanceof TargetedCardAction ) {
+                        action = action.new(position);
+                    } else if (selectedTile.activeBeam) {
+                        action = action.new(selectedTile.activeBeam.angle);
+                    }
                     selectedTile.selectedCardAction = null;
                     sendPlayerPacket(new CardActionPlayerPacket(
                         selectedTile.placedCard.card.entityId,
