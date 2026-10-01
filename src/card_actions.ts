@@ -2,7 +2,7 @@ import { BoardPosition, drawLine } from "./board";
 import { ElementType } from "./elements";
 import { Board, Game, PlacedCard, Player, Tile } from "./engine";
 import { ActionHeaderRowItem, HeartHeaderRowItem } from "./header_row_items";
-import { FireParticle } from "./particles";
+import { FireParticle, Particle, particlesRegistry, WaterParticle } from "./particles";
 import { DamageServerPacket, MoveCardServerPacket, ShowParticleServerPacket } from "./server_packets";
 import { clone } from "./utils";
 
@@ -164,10 +164,10 @@ class LeapCardAction extends TargetedCardAction {
         let tiles: [BoardPosition, TileHighlightColor][] = [];
         let directions: [number, number][] = [[2, 1], [2, -1], [-2, 1], [-2, -1]];
         let position = board.positionOf(card);
-        for (let flip of [false,true]) {
+        for (let flip of [false, true]) {
             for (let direction of directions) {
                 if (flip) {
-                    direction = [direction[1],direction[0]];
+                    direction = [direction[1], direction[0]];
                 }
                 let newPos = position.add(direction);
                 if (newPos.isOutsideBoard(board)) {
@@ -268,7 +268,7 @@ export class BeamCardAction extends CardAction {
         a.angle = angle;
         return a;
     }
-    static snapAngle(angle:number):number {
+    static snapAngle(angle: number): number {
         let snap = Math.PI / 4.0;
         angle = Math.round(angle / snap) * snap;
         return angle
@@ -287,18 +287,20 @@ export class BreathAttackCardAction extends BeamCardAction {
     damage = 3;
     color = <any>null;
     element: ElementType = <any>null;
-    constructor(name: string, desc: string, element: ElementType, color: TileHighlightColor) {
+    particleIndex: number;
+    constructor(name: string, desc: string, element: ElementType, color: TileHighlightColor, particle: Particle) {
         super();
         this.name = name;
         this.desc = desc;
         this.color = color;
         this.element = element;
+        this.particleIndex = particlesRegistry.indexOf(particle);
     }
     use(game: Game, tile: Tile, card: PlacedCard, player: Player): void {
-        let tiles = drawLine(game.board.positionOf(card),this.angle,this.range,false,game.board.size);
+        let tiles = drawLine(game.board.positionOf(card), this.angle, this.range, false, game.board.size);
         let packets = [];
         for (let position of tiles) {
-            let particle = new FireParticle(position);
+            let particle = new (<any>particlesRegistry[this.particleIndex]).constructor(position);
             packets.push(new ShowParticleServerPacket(particle));
 
             let targetTile = game.board.getTileAt(position);
@@ -318,13 +320,15 @@ export let fireBreathCardAction = new BreathAttackCardAction(
     "Fire Breath",
     "Fires a concentrated beam of fire.",
     ElementType.Fire,
-    TileHighlightColor.RedSelect
+    TileHighlightColor.RedSelect,
+    FireParticle.prototype,
 );
 export let waterSprayCardAction = new BreathAttackCardAction(
     "Water Spray",
     "Shoots a concentrated burst of water.",
     ElementType.Water,
-    TileHighlightColor.RedSelect
+    TileHighlightColor.RedSelect,
+    WaterParticle.prototype,
 );
 
 
