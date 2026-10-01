@@ -36,3 +36,7 @@ export class FireParticle extends ElementParticle {
         super.update(deltaTime);
     }
 }
+
+export let particlesRegistry: Particle[] = [
+    FireParticle.prototype,
+]

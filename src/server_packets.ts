@@ -1,5 +1,7 @@
 import { BoardPosition } from "./board";
 import { Card, CardRoundData } from "./cards";
+import { Particle, particlesRegistry } from "./particles";
+import { encodePacket } from "./utils";
 
 export class ErrorServerPacket {
     text: string;
@@ -43,6 +45,19 @@ export class DamageServerPacket {
         this.attackerEntityId = attackerEntityId;
         this.victimEntityId = victimEntityId;
         this.amount = amount;
+    }
+}
+
+export class ShowParticleServerPacket {
+    payload: string;
+    constructor(particle: Particle | string) {
+        let encoded: string;
+        if (particle instanceof Particle) {
+            encoded = encodePacket(particle, particlesRegistry);
+        } else {
+            encoded = particle;
+        }
+        this.payload = encoded;
     }
 }
 
