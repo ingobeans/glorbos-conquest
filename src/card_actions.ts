@@ -223,6 +223,11 @@ export class BeamCardAction extends CardAction {
         a.angle = angle;
         return a;
     }
+    valid(board: Board, card: PlacedCard, player: Player): boolean {
+        let snap = Math.PI / 4.0;
+        this.angle = Math.round(this.angle / snap) * snap;
+        return true;
+    }
 }
 
 export class BreathAttackCardAction extends BeamCardAction {
