@@ -147,7 +147,7 @@ export let moveCardAction = new MoveCardAction();
 class LeapCardAction extends TargetedCardAction {
     name = "Leap";
     desc = "Move in an L";
-    // usesResources = [CardActionResource.Movement];
+    usesResources = [CardActionResource.Movement];
     availableCustom(board: Board, card: PlacedCard, player: Player): boolean {
         let highlightedTiles = this.highlightsTiles(board, card, player);
         if (highlightedTiles.length == 0)
