@@ -301,7 +301,8 @@ body {
 
 .animated {
     --img-count: 5;
-    animation: animated steps(calc(var(--img-count) - 1)) 0.5s forwards;
+    --anim-time: 0.5s;
+    animation: animated steps(calc(var(--img-count) - 1)) var(--anim-time) forwards;
 }
 
 .selected-placed-card {
